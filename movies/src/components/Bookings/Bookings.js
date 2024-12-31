@@ -1,0 +1,776 @@
+// // import React, { Fragment, useEffect, useState } from 'react'
+// // import { useParams } from 'react-router-dom';
+// // import { getMovieDetails, newBooking } from '../../api-helper/api_helper';
+// // import { Typography, Box, FormLabel, TextField, Button } from '@mui/material';
+
+// // const Bookings = () => {
+// //     const [movie, setMovie] = useState();
+// //     const [inputs, setInputs] = useState({ seatNumber: "", date: "" });
+// //     const id = useParams().id;
+// //     console.log(id);
+
+// //     useEffect(() => {
+// //         getMovieDetails(id).then((res) => setMovie(res.movie))
+
+// //             .catch(err => console.log(err));
+// //     }, [id]);
+// //     const handleChange = (e) => {
+// //         setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+// //     }
+// //     const handleSubmit = (e) => {
+// //         e.preventDefault();//send data to url and refresh the page
+// //         console.log(inputs);
+// //        newBooking({...inputs,movie:movie._id})
+// //        .then((res)=>console.log(res))
+// //        .catch(err=>console.log(err));
+
+// //     };
+// //     return (
+// // <Box>
+// //       {movie && (
+// //         <Fragment>
+// //           <Typography
+// //             padding={3}
+// //             fontFamily="fantasy"
+// //             variant="h4"
+// //             textAlign={"center"}
+// //           >
+// //             Book TIckets Of Event: {movie.title}
+// //           </Typography>
+// //           <Box display={"flex"} justifyContent={"center"}>
+// //             <Box
+// //               display={"flex"}
+// //               justifyContent={"column"}
+// //               flexDirection="column"
+// //               paddingTop={3}
+// //               width="50%"
+// //               marginRight={"auto"}
+// //             >
+// //               <img
+// //                 width="80%"
+// //                 height={"300px"}
+// //                 src={movie.postedUrl}
+// //                 alt={movie.title}
+// //               />
+// //               <Box width={"80%"} marginTop={3} padding={2}>
+// //                 <Typography paddingTop={2}>{movie.description}</Typography>
+// //                 <Typography fontWeight={"bold"} marginTop={1}>
+// //                   Starrer:
+// //                   {movie.actors.map((actor) => " " + actor + " ")}
+// //                 </Typography>
+// //                 <Typography fontWeight={"bold"} marginTop={1}>
+// //                   Release Date: {new Date(movie.releaseDate).toDateString()}
+// //                 </Typography>
+// //                 <Typography paddingTop={2}>{movie.location}</Typography>
+// //               </Box>
+// //             </Box>
+// //             <Box width={"50%"} paddingTop={3}>
+// //               <form onSubmit={handleSubmit}>
+// //                 <Box
+// //                   padding={5}
+// //                   margin={"auto"}
+// //                   display="flex"
+// //                   flexDirection={"column"}
+// //                 >
+// //                   <FormLabel>Seat Number</FormLabel>
+// //                   <TextField
+// //                     name="seatNumber"
+// //                     value={inputs.seatNumber}
+// //                     onChange={handleChange}
+// //                     type={"number"}
+// //                     margin="normal"
+// //                     variant="standard"
+// //                   />
+// //                   <FormLabel>Booking Date</FormLabel>
+// //                   <TextField
+// //                     name="date"
+// //                     type={"date"}
+// //                     margin="normal"
+// //                     variant="standard"
+// //                     value={inputs.date}
+// //                     onChange={handleChange}
+// //                   />
+// //                   <Button type="submit" sx={{ mt: 3 }}>
+// //                     Book Now
+// //                   </Button>
+// //                 </Box>
+// //               </form>
+// //             </Box>
+// //           </Box>
+// //         </Fragment>
+// //       )}
+// //     </Box>
+// //   );
+// // };
+
+// // export default Bookings;
+// import React, { Fragment, useEffect, useState } from 'react';
+// import { useParams } from 'react-router-dom';
+// import { getMovieDetails, newBooking } from '../../api-helper/api_helper';
+// import { Typography, Box, FormLabel, TextField, Button, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+
+// const Bookings = () => {
+//   const [movie, setMovie] = useState();
+//   const [inputs, setInputs] = useState({ seatNumber: 1, date: "", seatType: "premium" });
+//   const [totalPrice, setTotalPrice] = useState(0); // For dynamic price calculation
+//   const id = useParams().id;
+
+//   useEffect(() => {
+//     getMovieDetails(id).then((res) => {
+//       setMovie(res.movie);
+//       setTotalPrice(res.movie.price.premium); // Default to premium
+//     }).catch(err => console.log(err));
+//   }, [id]);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+
+//     // Update inputs state
+//     setInputs((prev) => ({ ...prev, [name]: value }));
+
+//     // Update total price dynamically
+//     if (name === "seatNumber" || name === "seatType") {
+//       const seatCount = name === "seatNumber" ? value : inputs.seatNumber;
+//       const seatType = name === "seatType" ? value : inputs.seatType;
+//       if (movie) {
+//         setTotalPrice(seatCount * movie.price[seatType]);
+//       }
+//     }
+//   };
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     newBooking({ ...inputs, movie: movie._id })
+//       .then((res) => console.log(res))
+//       .catch(err => console.log(err));
+//   };
+
+//   return (
+//     <Box>
+//       {movie && (
+//         <Fragment>
+//           <Typography
+//             padding={3}
+//             fontFamily="fantasy"
+//             variant="h4"
+//             textAlign={"center"}
+//           >
+//             Book Tickets for Event: {movie.title}
+//           </Typography>
+//           <Box display={"flex"} justifyContent={"center"}>
+//             <Box
+//               display={"flex"}
+//               flexDirection="column"
+//               paddingTop={3}
+//               width="50%"
+//               marginRight={"auto"}
+//             >
+//               <img
+//                 width="80%"
+//                 height={"300px"}
+//                 src={movie.postedUrl}
+//                 alt={movie.title}
+//               />
+//               <Box width={"80%"} marginTop={3} padding={2}>
+//                 <Typography paddingTop={2}>{movie.description}</Typography>
+//                 <Typography fontWeight={"bold"} marginTop={1}>
+//                   Starrer: {movie.actors.join(", ")}
+//                 </Typography>
+//                 <Typography fontWeight={"bold"} marginTop={1}>
+//                   Release Date: {new Date(movie.releaseDate).toDateString()}
+//                 </Typography>
+//                 <Typography paddingTop={2}>{movie.location}</Typography>
+//               </Box>
+//             </Box>
+//             <Box width={"50%"} paddingTop={3}>
+//               <form onSubmit={handleSubmit}>
+//                 <Box
+//                   padding={5}
+//                   margin={"auto"}
+//                   display="flex"
+//                   flexDirection={"column"}
+//                 >
+//                   <FormLabel>Seat Type</FormLabel>
+//                   <RadioGroup
+//                     name="seatType"
+//                     value={inputs.seatType}
+//                     onChange={handleChange}
+//                     row
+//                   >
+//                     <FormControlLabel
+//                       value="premium"
+//                       control={<Radio />}
+//                       label={`Premium (₹${movie.price.premium})`}
+//                     />
+//                     <FormControlLabel
+//                       value="royalClub"
+//                       control={<Radio />}
+//                       label={`Royal Club (₹${movie.price.royalClub})`}
+//                     />
+//                     <FormControlLabel
+//                       value="executive"
+//                       control={<Radio />}
+//                       label={`Executive (₹${movie.price.executive})`}
+//                     />
+//                   </RadioGroup>
+
+//                   <FormLabel>Number of Seats</FormLabel>
+//                   <TextField
+//                     name="seatNumber"
+//                     type="number"
+//                     value={inputs.seatNumber}
+//                     onChange={handleChange}
+//                     margin="normal"
+//                     variant="standard"
+//                     inputProps={{ min: 1, max: 10 }}
+//                   />
+
+//                   <FormLabel>Booking Date</FormLabel>
+//                   <TextField
+//                     name="date"
+//                     type={"date"}
+//                     margin="normal"
+//                     variant="standard"
+//                     value={inputs.date}
+//                     onChange={handleChange}
+//                     inputProps={{ min: new Date().toISOString().split("T")[0] }}
+//                   />
+
+//                   <Typography fontWeight="bold" marginTop={2}>
+//                     Total Price: ₹{totalPrice}
+//                   </Typography>
+
+//                   <Button type="submit" sx={{ mt: 3 }}>
+//                     Pay Now
+//                   </Button>
+//                 </Box>
+//               </form>
+//             </Box>
+//           </Box>
+//         </Fragment>
+//       )}
+//     </Box>
+//   );
+// };
+
+// export default Bookings;
+// import React, { Fragment, useEffect, useState } from 'react';
+// import { useParams } from 'react-router-dom';
+// import { getMoviesAndApprovedEvents, newBooking } from '../../api-helper/api_helper';
+// import { Typography, Box, Button, RadioGroup, FormControlLabel, Radio, TextField, FormLabel } from '@mui/material';
+
+// const Bookings = () => {
+//   const [events, setEvents] = useState([]); // Store approved events
+//   const [movie, setMovie] = useState(null); // Store selected movie
+//   const [inputs, setInputs] = useState({ seatNumber: 1, date: "", seatType: "premium" });
+//   const [totalPrice, setTotalPrice] = useState(0);
+//   const id = useParams().id; // Get the movie/event ID from the URL
+
+//   useEffect(() => {
+//     getMoviesAndApprovedEvents().then((res) => {
+//       setEvents(res.approvedEvents); // Set approved events
+//       const selectedMovie = res.movies.find(movie => movie._id === id); // Find selected movie by ID
+//       setMovie(selectedMovie);
+//       if (selectedMovie) {
+//         setTotalPrice(selectedMovie.price.premium); // Default to premium price
+//       }
+//     }).catch((err) => console.log(err));
+//   }, [id]); // Fetch data when the component mounts or ID changes
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setInputs(prev => ({ ...prev, [name]: value }));
+
+//     if (name === "seatNumber" || name === "seatType") {
+//       const seatCount = name === "seatNumber" ? value : inputs.seatNumber;
+//       const seatType = name === "seatType" ? value : inputs.seatType;
+//       if (movie) {
+//         setTotalPrice(seatCount * movie.price[seatType]);
+//       }
+//     }
+//   };
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     if (movie) {
+//       newBooking({ ...inputs, movie: movie._id })
+//         .then((res) => console.log(res))
+//         .catch(err => console.log(err));
+//     }
+//   };
+
+//   return (
+//     <Box>
+//       {/* Display movie details */}
+//       {movie && (
+//         <Fragment>
+//           <Typography padding={3} fontFamily="fantasy" variant="h4" textAlign={"center"}>
+//             Book Tickets for Event: {movie.title}
+//           </Typography>
+//           <Box display={"flex"} justifyContent={"center"}>
+//             <Box display={"flex"} flexDirection="column" paddingTop={3} width="50%" marginRight={"auto"}>
+//               <img width="80%" height={"300px"} src={movie.postedUrl} alt={movie.title} />
+//               <Box width={"80%"} marginTop={3} padding={2}>
+//                 <Typography paddingTop={2}>{movie.description}</Typography>
+//                 <Typography fontWeight={"bold"} marginTop={1}>
+//                   Starrer: {movie.actors.join(", ")}
+//                 </Typography>
+//                 <Typography fontWeight={"bold"} marginTop={1}>
+//                   Release Date: {new Date(movie.releaseDate).toDateString()}
+//                 </Typography>
+//                 <Typography paddingTop={2}>{movie.location}</Typography>
+//               </Box>
+//             </Box>
+//             <Box width={"50%"} paddingTop={3}>
+//               <form onSubmit={handleSubmit}>
+//                 <Box padding={5} margin={"auto"} display="flex" flexDirection={"column"}>
+//                   <FormLabel>Seat Type</FormLabel>
+//                   <RadioGroup name="seatType" value={inputs.seatType} onChange={handleChange} row>
+//                     <FormControlLabel value="premium" control={<Radio />} label={`Premium (₹${movie.price.premium})`} />
+//                     <FormControlLabel value="royalClub" control={<Radio />} label={`Royal Club (₹${movie.price.royalClub})`} />
+//                     <FormControlLabel value="executive" control={<Radio />} label={`Executive (₹${movie.price.executive})`} />
+//                   </RadioGroup>
+
+//                   <FormLabel>Number of Seats</FormLabel>
+//                   <TextField name="seatNumber" type="number" value={inputs.seatNumber} onChange={handleChange} margin="normal" variant="standard" inputProps={{ min: 1, max: 10 }} />
+
+//                   <FormLabel>Booking Date</FormLabel>
+//                   <TextField name="date" type={"date"} margin="normal" variant="standard" value={inputs.date} onChange={handleChange} inputProps={{ min: new Date().toISOString().split("T")[0] }} />
+
+//                   <Typography fontWeight="bold" marginTop={2}>
+//                     Total Price: ₹{totalPrice}
+//                   </Typography>
+
+//                   <Button type="submit" sx={{ mt: 3 }}>
+//                     Pay Now
+//                   </Button>
+//                 </Box>
+//               </form>
+//             </Box>
+//           </Box>
+//         </Fragment>
+//       )}
+      
+//       {/* Displaying approved events */}
+      
+//   <Fragment>
+//     <Typography variant="h5" fontWeight="bold" marginTop={3}>
+//       Approved Events
+//     </Typography>
+//     <Box display={"flex"} flexWrap="wrap">
+//       {events.map((event) => (
+//         <Box key={event._id} width="30%" margin="10px" padding={2} boxShadow={3}>
+//           {/* Displaying the event's image */}
+//           {event.postedUrl && (
+//             <img 
+//               src={event.postedUrl} 
+//               alt={event.title} 
+//               style={{ width: "100%", height: "200px", objectFit: "cover", marginBottom: "10px" }} 
+//             />
+//           )}
+//           <Typography variant="h6">{event.title}</Typography>
+//           <Typography>{event.description}</Typography>
+//           <Button variant="contained" color="primary" onClick={() => setMovie(event)}>
+//             Book Now
+//           </Button>
+//         </Box>
+//       ))}
+//     </Box>
+//   </Fragment>
+//     </Box>
+//   );
+// };
+
+// export default Bookings;
+
+
+
+
+import React, { Fragment, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getMoviesAndApprovedEvents, newBooking } from '../../api-helper/api_helper';
+import { Typography, Box, Button, RadioGroup, FormControlLabel, Radio, TextField, FormLabel, Modal } from '@mui/material';
+
+const Bookings = () => {
+  const [events, setEvents] = useState([]); // Store approved events
+  const [movie, setMovie] = useState(null); // Store selected movie
+  const [inputs, setInputs] = useState({ seatNumber: 1, date: "", seatType: "premium" });
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [openModal, setOpenModal] = useState(false); // To manage modal visibility
+  const [bookingDetails, setBookingDetails] = useState(null); // Store booking confirmation details
+  const id = useParams().id; // Get the movie/event ID from the URL
+
+  useEffect(() => {
+    getMoviesAndApprovedEvents().then((res) => {
+      setEvents(res.approvedEvents); // Set approved events
+      const selectedMovie = res.movies.find(movie => movie._id === id); // Find selected movie by ID
+      setMovie(selectedMovie);
+      if (selectedMovie) {
+        setTotalPrice(selectedMovie.price.premium); // Default to premium price
+      }
+    }).catch((err) => console.log(err));
+  }, [id]); // Fetch data when the component mounts or ID changes
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setInputs(prev => ({ ...prev, [name]: value }));
+
+    if (name === "seatNumber" || name === "seatType") {
+      const seatCount = name === "seatNumber" ? value : inputs.seatNumber;
+      const seatType = name === "seatType" ? value : inputs.seatType;
+      if (movie) {
+        setTotalPrice(seatCount * movie.price[seatType]);
+      }
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (movie) {
+      newBooking({ ...inputs, movie: movie._id })
+        .then((res) => {
+          // Set the booking details and show the modal
+          setBookingDetails({
+            title: movie.title,
+            seatNumber: inputs.seatNumber,
+            totalPrice: totalPrice,
+            date: inputs.date,
+            postedUrl: movie.postedUrl
+          });
+          setOpenModal(true); // Open the modal on successful booking
+        })
+        .catch(err => console.log(err));
+    }
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  return (
+    <Box>
+      {/* Display movie details */}
+      {movie && (
+        <Fragment>
+          <Typography padding={3} fontFamily="fantasy" variant="h4" textAlign={"center"}>
+            Book Tickets for Event: {movie.title}
+          </Typography>
+          <Box display={"flex"} justifyContent={"center"}>
+            <Box display={"flex"} flexDirection="column" paddingTop={3} width="50%" marginRight={"auto"}>
+              <img width="80%" height={"300px"} src={movie.postedUrl} alt={movie.title} />
+              <Box width={"80%"} marginTop={3} padding={2}>
+                <Typography paddingTop={2}>{movie.description}</Typography>
+                <Typography fontWeight={"bold"} marginTop={1}>
+                  Starrer: {movie.actors.join(", ")}
+                </Typography>
+                <Typography fontWeight={"bold"} marginTop={1}>
+                  Release Date: {new Date(movie.releaseDate).toDateString()}
+                </Typography>
+                <Typography paddingTop={2}>{movie.location}</Typography>
+              </Box>
+            </Box>
+            <Box width={"50%"} paddingTop={3}>
+              <form onSubmit={handleSubmit}>
+                <Box padding={5} margin={"auto"} display="flex" flexDirection={"column"}>
+                  <FormLabel>Seat Type</FormLabel>
+                  <RadioGroup name="seatType" value={inputs.seatType} onChange={handleChange} row>
+                    <FormControlLabel value="premium" control={<Radio />} label={`Premium (₹${movie.price.premium})`} />
+                    <FormControlLabel value="royalClub" control={<Radio />} label={`Royal Club (₹${movie.price.royalClub})`} />
+                    <FormControlLabel value="executive" control={<Radio />} label={`Executive (₹${movie.price.executive})`} />
+                  </RadioGroup>
+
+                  <FormLabel>Number of Seats</FormLabel>
+                  <TextField name="seatNumber" type="number" value={inputs.seatNumber} onChange={handleChange} margin="normal" variant="standard" inputProps={{ min: 1, max: 10 }} />
+
+                  <FormLabel>Booking Date</FormLabel>
+                  <TextField name="date" type={"date"} margin="normal" variant="standard" value={inputs.date} onChange={handleChange} inputProps={{ min: new Date().toISOString().split("T")[0] }} />
+
+                  <Typography fontWeight="bold" marginTop={2}>
+                    Total Price: ₹{totalPrice}
+                  </Typography>
+
+                  <Button type="submit" sx={{ mt: 3 }}>
+                    Pay Now
+                  </Button>
+                </Box>
+              </form>
+            </Box>
+          </Box>
+        </Fragment>
+      )}
+
+      {/* Displaying approved events */}
+      <Fragment>
+        <Typography variant="h5" fontWeight="bold" marginTop={3}>
+          Approved Events
+        </Typography>
+        <Box display={"flex"} flexWrap="wrap">
+          {events.map((event) => (
+            <Box key={event._id} width="30%" margin="10px" padding={2} boxShadow={3}>
+              {/* Displaying the event's image */}
+              {event.postedUrl && (
+                <img 
+                  src={event.postedUrl} 
+                  alt={event.title} 
+                  style={{ width: "100%", height: "200px", objectFit: "cover", marginBottom: "10px" }} 
+                />
+              )}
+              <Typography variant="h6">{event.title}</Typography>
+              <Typography>{event.description}</Typography>
+              <Button variant="contained" color="primary" onClick={() => setMovie(event)}>
+                Book Now
+              </Button>
+            </Box>
+          ))}
+        </Box>
+      </Fragment>
+
+      {/* Modal for successful booking */}
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="booking-confirmation"
+        aria-describedby="successful-booking-details"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            p: 4,
+            textAlign: 'center'
+          }}
+        >
+          {bookingDetails && (
+            <Fragment>
+              <Typography variant="h6" fontWeight="bold">
+                Booking Successful!
+              </Typography>
+              <img
+                src={bookingDetails.postedUrl}
+                alt={bookingDetails.title}
+                style={{ width: '100%', height: '200px', objectFit: 'cover', marginBottom: '10px' }}
+              />
+              <Typography variant="body1">
+                Movie: {bookingDetails.title}
+              </Typography>
+              <Typography variant="body1">
+                Seats: {bookingDetails.seatNumber}
+              </Typography>
+              <Typography variant="body1">
+                Total Price: ₹{bookingDetails.totalPrice}
+              </Typography>
+              <Typography variant="body1">
+                Booking Date: {new Date(bookingDetails.date).toDateString()}
+              </Typography>
+              <Button variant="contained" color="primary" onClick={handleCloseModal} sx={{ mt: 2 }}>
+                Confirm
+              </Button>
+            </Fragment>
+          )}
+        </Box>
+      </Modal>
+    </Box>
+  );
+};
+
+export default Bookings;
+
+// import React, { Fragment, useEffect, useState } from 'react';
+// import { useParams } from 'react-router-dom';
+// import { getMoviesAndApprovedEvents, newBooking } from '../../api-helper/api_helper';
+// import { Typography, Box, Button, RadioGroup, FormControlLabel, Radio, TextField, FormLabel, Modal } from '@mui/material';
+
+// const Bookings = () => {
+//   const [events, setEvents] = useState([]); // Store approved events
+//   const [movie, setMovie] = useState(null); // Store selected movie
+//   const [inputs, setInputs] = useState({ seatNumber: 1, date: "", seatType: "premium" });
+//   const [totalPrice, setTotalPrice] = useState(0);
+//   const [openModal, setOpenModal] = useState(false); // To manage modal visibility
+//   const [bookingDetails, setBookingDetails] = useState(null); // Store booking confirmation details
+//   const id = useParams().id; // Get the movie/event ID from the URL
+
+//   useEffect(() => {
+//     getMoviesAndApprovedEvents().then((res) => {
+//       setEvents(res.approvedEvents); // Set approved events
+//       const selectedMovie = res.movies.find(movie => movie._id === id); // Find selected movie by ID
+//       setMovie(selectedMovie);
+//       if (selectedMovie) {
+//         setTotalPrice(selectedMovie.price.premium); // Default to premium price
+//       }
+//     }).catch((err) => console.log(err));
+//   }, [id]); // Fetch data when the component mounts or ID changes
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setInputs(prev => ({ ...prev, [name]: value }));
+
+//     if (name === "seatNumber" || name === "seatType") {
+//       const seatCount = name === "seatNumber" ? value : inputs.seatNumber;
+//       const seatType = name === "seatType" ? value : inputs.seatType;
+//       if (movie) {
+//         setTotalPrice(seatCount * movie.price[seatType]);
+//       }
+//     }
+//   };
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     if (movie) {
+//       newBooking({ ...inputs, movie: movie._id })
+//         .then((res) => {
+//           // Set the booking details and show the modal
+//           setBookingDetails({
+//             title: movie.title,
+//             seatNumber: inputs.seatNumber,
+//             totalPrice: totalPrice,
+//             date: inputs.date,
+//             postedUrl: movie.postedUrl
+//           });
+//           setOpenModal(true); // Open the modal on successful booking
+//         })
+//         .catch(err => console.log(err));
+//     }
+//   };
+
+//   const handleCloseModal = () => {
+//     setOpenModal(false);
+//   };
+
+//   return (
+//     <Box>
+//       {/* Display movie details */}
+//       {movie && (
+//         <Fragment>
+//           <Typography padding={3} fontFamily="fantasy" variant="h4" textAlign={"center"}>
+//             Book Tickets for Event: {movie.title}
+//           </Typography>
+//           <Box display={"flex"} justifyContent={"center"}>
+//             <Box display={"flex"} flexDirection="column" paddingTop={3} width="50%" marginRight={"auto"}>
+//               <img width="80%" height={"300px"} src={movie.postedUrl} alt={movie.title} />
+//               <Box width={"80%"} marginTop={3} padding={2}>
+//                 <Typography paddingTop={2}>{movie.description}</Typography>
+//                 <Typography fontWeight={"bold"} marginTop={1}>
+//                   Starrer: {movie.actors.join(", ")}
+//                 </Typography>
+//                 <Typography fontWeight={"bold"} marginTop={1}>
+//                   Release Date: {new Date(movie.releaseDate).toDateString()}
+//                 </Typography>
+//                 <Typography paddingTop={2}>{movie.location}</Typography>
+//               </Box>
+//             </Box>
+//             <Box width={"50%"} paddingTop={3}>
+//               <form onSubmit={handleSubmit}>
+//                 <Box padding={5} margin={"auto"} display="flex" flexDirection={"column"}>
+//                   <FormLabel>Seat Type</FormLabel>
+//                   <RadioGroup name="seatType" value={inputs.seatType} onChange={handleChange} row>
+//                     <FormControlLabel value="premium" control={<Radio />} label={`Premium (₹${movie.price.premium})`} />
+//                     <FormControlLabel value="royalClub" control={<Radio />} label={`Royal Club (₹${movie.price.royalClub})`} />
+//                     <FormControlLabel value="executive" control={<Radio />} label={`Executive (₹${movie.price.executive})`} />
+//                   </RadioGroup>
+
+//                   <FormLabel>Number of Seats</FormLabel>
+//                   <TextField name="seatNumber" type="number" value={inputs.seatNumber} onChange={handleChange} margin="normal" variant="standard" inputProps={{ min: 1, max: 10 }} />
+
+//                   <FormLabel>Booking Date</FormLabel>
+//                   <TextField name="date" type={"date"} margin="normal" variant="standard" value={inputs.date} onChange={handleChange} inputProps={{ min: new Date().toISOString().split("T")[0] }} />
+
+//                   <Typography fontWeight="bold" marginTop={2}>
+//                     Total Price: ₹{totalPrice}
+//                   </Typography>
+
+//                   <Button type="submit" sx={{ mt: 3 }}>
+//                     Pay Now
+//                   </Button>
+//                 </Box>
+//               </form>
+//             </Box>
+//           </Box>
+//         </Fragment>
+//       )}
+
+//       {/* Displaying approved events */}
+//       <Fragment>
+//         <Typography variant="h5" fontWeight="bold" marginTop={3}>
+//           Approved Events
+//         </Typography>
+//         <Box display={"flex"} flexWrap="wrap">
+//           {events.map((event) => (
+//             <Box key={event._id} width="30%" margin="10px" padding={2} boxShadow={3}>
+//               {/* Displaying the event's image */}
+//               {event.postedUrl && (
+//                 <img 
+//                   src={event.postedUrl} 
+//                   alt={event.title} 
+//                   style={{ width: "100%", height: "200px", objectFit: "cover", marginBottom: "10px" }} 
+//                 />
+//               )}
+//               <Typography variant="h6">{event.title}</Typography>
+//               <Typography>{event.description}</Typography>
+//               <Button variant="contained" color="primary" onClick={() => setMovie(event)}>
+//                 Book Now
+//               </Button>
+//             </Box>
+//           ))}
+//         </Box>
+//       </Fragment>
+
+//       {/* Modal for successful booking */}
+//       <Modal
+//         open={openModal}
+//         onClose={handleCloseModal}
+//         aria-labelledby="booking-confirmation"
+//         aria-describedby="successful-booking-details"
+//       >
+//         <Box
+//           sx={{
+//             position: 'absolute',
+//             top: '50%',
+//             left: '50%',
+//             transform: 'translate(-50%, -50%)',
+//             width: 400,
+//             bgcolor: 'background.paper',
+//             boxShadow: 24,
+//             p: 4,
+//             textAlign: 'center'
+//           }}
+//         >
+//           {bookingDetails && (
+//             <Fragment>
+//               <Typography variant="h6" fontWeight="bold">
+//                 Booking Successful!
+//               </Typography>
+//               <img
+//                 src={bookingDetails.postedUrl}
+//                 alt={bookingDetails.title}
+//                 style={{ width: '100%', height: '200px', objectFit: 'cover', marginBottom: '10px' }}
+//               />
+//               <Typography variant="body1">
+//                 Movie: {bookingDetails.title}
+//               </Typography>
+//               <Typography variant="body1">
+//                 Seats: {bookingDetails.seatNumber}
+//               </Typography>
+//               <Typography variant="body1">
+//                 Total Price: ₹{bookingDetails.totalPrice}
+//               </Typography>
+//               <Typography variant="body1">
+//                 Booking Date: {new Date(bookingDetails.date).toDateString()}
+//               </Typography>
+//               <Button variant="contained" color="primary" onClick={handleCloseModal} sx={{ mt: 2 }}>
+//                 Confirm
+//               </Button>
+//             </Fragment>
+//           )}
+//         </Box>
+//       </Modal>
+//     </Box>
+//   );
+// };
+
+// export default Bookings;
+
