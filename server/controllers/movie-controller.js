@@ -7,58 +7,7 @@ const Event = require('../models/Event');
 require("dotenv").config();
 module.exports = function (app, err) {
 
-    // const addMovie = async (req, res, next) => {
-    //     const extractedToken = req.headers.authorization.split(" ")[1];//
-
-    //     if (!extractedToken && extractedToken.trim === "") {
-    //         return res.status(404).json({ message: "Invalid Token" });
-    //     }
-
-    //     console.log(extractedToken);
-    //     let adminId;
-    //     //verify token
-    //     jwt.verify(extractedToken, process.env.SECRET_KEY, (err, decrypt) => {
-    //         if (err) {
-    //             return res.status(404).json({ message: "Invalid Token" });
-    //         }
-    //         else {
-    //             adminId = decrypt.id;
-    //             return;
-    //         }
-    //     });
-
-    //     //create Movie 
-    //     const { title, description, releaseDate,location, postedUrl, featured, actors } = req.body;
-    //     if (!title && title.trim() === "" && !description && description.trim() == "" &&
-    //         !postedUrl && postedUrl.trim() === ""
-    //     ) {
-    //         return res.status(422).json({ message: "Invalid Inputs" });
-    //     }
-    //     let movie;
-    //     try {
-    //         movie = new Movie({
-    //             title, description, releaseDate: new Date(
-    //                 `${releaseDate}`),location, postedUrl, featured, actors, admin: adminId
-    //         });
-    //         const session = await mongoose.startSession();
-    //         const adminUser = await Admin.findById(adminId);
-    //         session.startTransaction();
-    //         await movie.save({ session });
-
-    //         adminUser.addedMovies.push(movie); +
-    //             await adminUser.save({ session });
-    //         await session.commitTransaction();
-    //     } catch (err) {
-    //         return console.log(err);
-    //     }
-    //     if (!movie) {
-    //         return res.status(500).json({ message: "  Request movie failed" });  // If no users found, return an error
-    //     }
-    //     return res.status(201).json({ movie });
-
-    // }
-
-
+    
     const addMovie = async (req, res, next) => {
         const extractedToken = req.headers.authorization.split(" ")[1];
 
@@ -291,9 +240,43 @@ module.exports = function (app, err) {
 
     app.put("/:id/approve", approveEvent); 
 
+    const deleteMovie = async (req, res) => {
+        const movieId = req.params.id;
+      
+        try {
+          // Find the movie by ID
+          const movie = await Movie.findById(movieId);
+          if (!movie) {
+            return res.status(404).json({ message: "Movie not found" });
+          }
+      
+          // Find the admin associated with the movie
+          const admin = await Admin.findById(movie.admin);
+          if (!admin) {
+            return res.status(404).json({ message: "Admin not found" });
+          }
+      
+          // Remove the movie from the admin's addedMovies array
+          admin.addedMovies.pull(movieId);
+          await admin.save();
+      
+          // Delete the movie's bookings if they exist
+          if (movie.bookings.length > 0) {
+            await mongoose.model("Bookings").deleteMany({ _id: { $in: movie.bookings } });
+          }
+      
+          // Delete the movie
+          await movie.deleteOne();
+      
+          res.status(200).json({ message: "Movie deleted successfully" });
+        } catch (err) {
+          console.error(err);
+          res.status(500).json({ message: "Failed to delete movie" });
+        }
+      };
+      
 
-
-
+      app.delete("/movie/:id", deleteMovie);
 
 
 

@@ -6,6 +6,7 @@ const getAllMovies = require('../controllers/movie-controller');
 const getMovieById = require('../controllers/movie-controller');
 const getApprovedEvents = require('../controllers/movie-controller');
 const approveEvent = require('../controllers/movie-controller');
+const deleteMovie = require('../controllers/movie-controller');
 module.exports = function (app, err) {
     const movieRouter = express.Router();
 
@@ -16,6 +17,6 @@ movieRouter.get("/Event",getApprovedEvents)
     movieRouter.get("/movie", getAllMovies); 
     movieRouter.get("/:id", getMovieById);//http://localhost:5000/6766c5510e253147e3fdc36d
 movieRouter.put("/:id/approve", approveEvent);
-
+movieRouter.delete("/movie/:id", deleteMovie);
     app.use("/movie", movieRouter);
 };

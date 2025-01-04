@@ -344,3 +344,11 @@ const approveEvent = async (eventId) => {
     console.error("Error approving event:", error);
   }
 };
+export const deleteMovieById = async (movieId) => {
+  try {
+    const response = await axios.delete(`/movie/${movieId}`);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
