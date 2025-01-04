@@ -5,7 +5,7 @@ import { getMoviesAndApprovedEvents, newBooking } from '../../api-helper/api_hel
 import { Typography, Box, Button, RadioGroup, FormControlLabel, Radio, TextField, FormLabel, Modal } from '@mui/material';
 
 const Bookings = () => {
-  const [events, setEvents] = useState([]); // Store approved events
+ // const [events, setEvents] = useState([]); // Store approved events
   const [movie, setMovie] = useState(null); // Store selected movie
   const [inputs, setInputs] = useState({ seatNumber: 1, date: "", seatType: "premium" });
   const [totalPrice, setTotalPrice] = useState(0);
@@ -15,7 +15,7 @@ const Bookings = () => {
 
   useEffect(() => {
     getMoviesAndApprovedEvents().then((res) => {
-      setEvents(res.approvedEvents); // Set approved events
+     // setEvents(res.approvedEvents); // Set approved events
       const selectedMovie = res.movies.find(movie => movie._id === id); // Find selected movie by ID
       setMovie(selectedMovie);
       if (selectedMovie) {

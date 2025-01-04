@@ -1,6 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Autocomplete, TextField, Tabs, Tab, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Button } from "@mui/material";
+import {
+  AppBar, Toolbar, Autocomplete, TextField, Tabs, Tab,
+  IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Button,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu"; // Import the MenuIcon
 import MovieIcon from "@mui/icons-material/Movie";
 import { Box } from "@mui/system";
 import { getAllMovies } from '../api-helper/api_helper';
@@ -13,14 +19,24 @@ const Header = () => {
   const dispatch = useDispatch();
   const isAdminLoggedIn = useSelector((state) => state.admin.isLoggedIn);
   const isUserLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  
+
   const [value, setValue] = useState(0);
   const [movies, setMovies] = useState([]);
-  
+
   // State for Dialog
   const [openDialog, setOpenDialog] = useState(false);
   const [logoutType, setLogoutType] = useState(null); // To track which type of user is logging out
 
+
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
   useEffect(() => {
     getAllMovies()
       .then((data) => {
@@ -36,7 +52,7 @@ const Header = () => {
   };
 
   // const handleChange = (_e, val) => {
-    
+
   //   const movie = movies.find((movie) => movie.title === val);
   //   if (isUserLoggedIn) {
   //     navigate(`/booking/${movie._id}`);
@@ -48,7 +64,7 @@ const Header = () => {
   const handleChange = (_e, val) => {
     // Find the movie object based on the selected title
     const movie = movies.find((movie) => movie.title === val);
-    
+
     if (movie) {
       // If a movie is found and the user is logged in, navigate to the booking page
       if (isUserLoggedIn) {
@@ -60,7 +76,7 @@ const Header = () => {
   };
 
 
-  
+
   const handleLogoutClick = (isAdmin) => {
     // Show confirmation dialog
     setLogoutType(isAdmin); // Set the type of logout (admin or user)
@@ -77,16 +93,16 @@ const Header = () => {
   };
 
   return (
-    <AppBar position="sticky" sx={{ bgcolor: "#2b2d2b" }}>
-      <Toolbar>
+    <AppBar position='fixed' sx={{ bgcolor: "#2b2d2b" }}>
+      <Toolbar sx={{ width: '99%' }}>
         <Box width={'20%'}>
           <IconButton LinkComponent={Link} to="/">
             <MovieIcon />
           </IconButton>
         </Box>
         {/* Searchbar */}
-        
-        <Box width={'20%'} margin={'auto'}>
+
+        <Box width={'25%'} margin={'auto'}>
           <Autocomplete onChange={handleChange}
             freeSolo
             options={movies && movies.map((movie) => movie.title)}
@@ -102,8 +118,8 @@ const Header = () => {
             )}
           />
         </Box>
-        <Box display={'flex'}>
-          <Tabs textColor="inherit" indicatorColor='secondary' 
+        <Box sx={{ display: { xs: "none", md: "flex" } }}>
+          <Tabs textColor="inherit" indicatorColor='secondary'
             onChange={(e, val) => setValue(val)} value={value}>
 
             <Tab LinkComponent={Link} to="/events" label="Events" />
@@ -126,6 +142,113 @@ const Header = () => {
             </>)}
           </Tabs>
         </Box>
+
+
+        {/* Hamburger Menu for smaller screens */}
+        <Box sx={{ display: { xs: "block", md: "none" } }}>
+          <IconButton color="inherit" onClick={handleMenuOpen}>
+            <MenuIcon />
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+            <MenuItem
+              onClick={() => {
+                navigate("/events");
+                handleMenuClose();
+              }}
+            >
+              Events
+            </MenuItem>
+            {!isAdminLoggedIn && !isUserLoggedIn && (
+              <>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/auth");
+                    handleMenuClose();
+                  }}
+                >
+                  Auth
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/admin");
+                    handleMenuClose();
+                  }}
+                >
+                  Admin
+                </MenuItem>
+              </>
+            )}
+            {isUserLoggedIn && (
+              <>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/user");
+                    handleMenuClose();
+                  }}
+                >
+                  Profile
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleLogoutClick(false);
+                    handleMenuClose();
+                  }}
+                >
+                  Logout
+                </MenuItem>
+              </>
+            )}
+            {isAdminLoggedIn && (
+              <>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/dashboard");
+                    handleMenuClose();
+                  }}
+                >
+                  Dashboard
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/add");
+                    handleMenuClose();
+                  }}
+                >
+                  Add Events
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/manage_events");
+                    handleMenuClose();
+                  }}
+                >
+                  Manage Events
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/user_admin");
+                    handleMenuClose();
+                  }}
+                >
+                  Profile
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleLogoutClick(true);
+                    handleMenuClose();
+                  }}
+                >
+                  Logout
+                </MenuItem>
+              </>
+            )}
+          </Menu>
+        </Box>
+
+
+
+
+
       </Toolbar>
 
       {/* Logout Confirmation Dialog */}

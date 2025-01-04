@@ -28,6 +28,23 @@ import aboutImage from './img/h-about.jpg';
 const HomePage = () => {
   const [zoom] = useState(1);
   const [movies, setMovies] = useState([]);
+  const images = [
+    "https://blog.inevent.com/wp-content/uploads/2024/04/The-Road-to-Return-on-Investment-With-EMS_1-min.webp",
+    "https://blog.inevent.com/wp-content/uploads/2024/04/A-Case-for-Customization-in-Your-Event-Management-Software_2-min.webp",
+    "https://blog.inevent.com/wp-content/uploads/2024/04/What-is-an-Event-Management-Software-Types-Benefits-and-Features-1180x570.webp",
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 12000); // Change image every 3 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [images.length]);
+
+
 
   useEffect(() => {
     getAllMovies()
@@ -56,14 +73,14 @@ const HomePage = () => {
         display={'flex'}
         justifyContent={'center'}
         alignItems={'center'}
-        padding={2}
+        paddingTop={-2}
       >
-        <img
-          src="https://blog.inevent.com/wp-content/uploads/2024/04/What-is-an-Event-Management-Software-Types-Benefits-and-Features-1180x570.webp"
-          alt="Rocketry"
-          width="100%"
-          height="100%"
-        />
+             <img
+        src={images[currentIndex]}
+        alt={`Slide ${currentIndex + 1}`}
+        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      />
+
       </Box>
 
       {/* About Conference Section */}

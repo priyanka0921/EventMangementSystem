@@ -264,7 +264,7 @@ const AddMovie = () => {
           boxShadow={"10px 10px 20px #ccc"}
         >
           <Typography textAlign={"center"} variant="h5" fontFamily={"verdana"}>
-            Add New Movie
+            Add New Event
           </Typography>
           <FormLabel sx={labelProps}>Title</FormLabel>
           <TextField
