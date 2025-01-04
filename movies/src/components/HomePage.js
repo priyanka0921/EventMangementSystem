@@ -1,116 +1,4 @@
-// import React, {useState, useEffect } from 'react'
-// import { Box } from "@mui/system";
-// import { Container, Grid, Typography, Button, List, ListItem, ListItemIcon } from '@mui/material';
-// import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-// import aboutImage from './img/h-about.jpg';
-// import MovieItem from './Movies/MovieItem';
-// import { Link } from "react-router-dom";
-// import { getAllMovies } from '../api-helper/api_helper';
-// const HomePage = () => {
-//   const[movies,setMovies]=useState([]);
-//   useEffect(()=>
-//   {
-//     getAllMovies().then((data)=>setMovies(data.movies))
-//     .catch((err)=>console.log(err));
-//   }
-//   ,[])
-//   console.log(movies);
-//   return (
-//     <Box width={'100%'} height={'auto'} marginTop={2}>
-//   <Box margin={'auto'} width="100%" height={"30%"} display={'flex'} justifyContent={'center'} alignItems={'center'} padding={2}>
-//   <img
-//       src="https://i.ytimg.com/vi/yEinBUJG2RI/maxresdefault.jpg"
-//       alt="Rocketry"
-//       width="100%"
-//       height="100%"
-//     />
 
-
-//   </Box>
-//   <Box>
-//   <section className="home-about-section">
-//   <Container sx={{ py: 4 }}>
-//     <Grid container spacing={4} alignItems="center">
-//       {/* Image Section */}
-//       <Grid item xs={12} md={6}>
-//         <div className="ha-pic">
-//           <img
-//             src={aboutImage}
-//             alt="About Conference"
-//             style={{ width: '100%', borderRadius: '8px' }}
-//           />
-//         </div>
-//       </Grid>
-//       {/* Text Section */}
-//       <Grid item xs={12} md={6}>
-//         <div className="ha-text">
-//           <Typography variant="h4" gutterBottom>
-//             About Conference
-//           </Typography>
-//           <Typography variant="body1" paragraph>
-//             When I first got into the online advertising business, I was looking for the magical
-//             combination that would put my website into the top search engine rankings, catapult me to
-//             the forefront of the minds or individuals looking to buy my product, and generally make me
-//             rich beyond my wildest dreams! After succeeding in the business for this long, I’m able to
-//             look back on my old self with this kind of thinking and shake my head.
-//           </Typography>
-//           <List>
-//             {[
-//               'Write On Your Business Card',
-//               'Advertising Outdoors',
-//               'Effective Advertising Pointers',
-//               'Kook 2 Directory Add Url Free',
-//             ].map((item, index) => (
-//               <ListItem key={index} sx={{ pl: 0 }}>
-//                 <ListItemIcon sx={{ minWidth: 'auto', mr: 1 }}>
-//                   <CheckCircleIcon color="primary" />
-//                 </ListItemIcon>
-//                 <Typography variant="body2">{item}</Typography>
-//               </ListItem>
-//             ))}
-//           </List>
-//           <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-//             Discover Now
-//           </Button>
-//         </div>
-//       </Grid>
-//     </Grid>
-//   </Container>
-// </section>
-// </Box>
-
-
-//     <Box padding={5} margin= 'auto'>
-//       <Typography variant="h4" textAlign={'center'}> Latest Events
-
-//       </Typography>
-
-//     </Box>
-//     <Box display="flex" width='100%'justifyContent={'center'} flexWrap="wrap">
-//       {movies.slice(0,5).map((movie, index) => <MovieItem id={movie.id} title={movie.title} releaseDate={movie.releaseDate}  location={movie.location} postedUrl={movie.postedUrl} key={index} />)}
-//     </Box>
-//     <Box display="flex" padding={5} margin="auto">
-//         <Button
-//           LinkComponent={Link}
-//           to="/events"
-//           variant="outlined"
-//           sx={{ margin: "auto", color: "#2b2d42" }}
-//         >
-//           View All Movies
-//         </Button>
-//       </Box>
-
-//       <Box sx={{ backgroundColor: '#333', color: '#fff', py: 3, textAlign: 'center' }}>
-//         <Typography variant="body2">
-//           © 2024 Your Event Management System. All rights reserved.
-//         </Typography>
-//       </Box>
-
-//     </Box>
-//   )
-// }
-
-// export default HomePage
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import {
@@ -162,7 +50,7 @@ const HomePage = () => {
         padding={2}
       >
         <img
-          src="https://i.ytimg.com/vi/yEinBUJG2RI/maxresdefault.jpg"
+          src="https://blog.inevent.com/wp-content/uploads/2024/04/What-is-an-Event-Management-Software-Types-Benefits-and-Features-1180x570.webp"
           alt="Rocketry"
           width="100%"
           height="100%"
@@ -278,7 +166,7 @@ const HomePage = () => {
                   <Box mb={4}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                       <MapPin className="w-5 h-5 text-primary" />
-                      <div>
+                      <Box>
                         <Typography variant="body1" fontWeight="bold">
                           Main Office
                         </Typography>
@@ -288,7 +176,7 @@ const HomePage = () => {
                         <Typography variant="body2" color="textSecondary">
                           Bhubaneswar, Odisha 751030
                         </Typography>
-                      </div>
+                      </Box>
                     </Box>
                   </Box>
 
@@ -296,7 +184,7 @@ const HomePage = () => {
                   <Box mb={4}>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                       <Home className="w-5 h-5 text-primary" />
-                      <div>
+                      <Box>
                         <Typography variant="body1" fontWeight="bold">
                           Branch Office
                         </Typography>
@@ -306,7 +194,7 @@ const HomePage = () => {
                         <Typography variant="body2" color="textSecondary">
                           Bhubaneswar, Odisha 751003
                         </Typography>
-                      </div>
+                      </Box>
                     </Box>
                   </Box>
 
