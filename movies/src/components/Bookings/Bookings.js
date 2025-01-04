@@ -113,30 +113,7 @@ const Bookings = () => {
       )}
 
       {/* Displaying approved events */}
-      <Fragment>
-        <Typography variant="h5" fontWeight="bold" marginTop={3}>
-          Approved Events
-        </Typography>
-        <Box display={"flex"} flexWrap="wrap">
-          {events.map((event) => (
-            <Box key={event._id} width="30%" margin="10px" padding={2} boxShadow={3}>
-              {/* Displaying the event's image */}
-              {event.postedUrl && (
-                <img 
-                  src={event.postedUrl} 
-                  alt={event.title} 
-                  style={{ width: "100%", height: "200px", objectFit: "cover", marginBottom: "10px" }} 
-                />
-              )}
-              <Typography variant="h6">{event.title}</Typography>
-              <Typography>{event.description}</Typography>
-              <Button variant="contained" color="primary" onClick={() => setMovie(event)}>
-                Book Now
-              </Button>
-            </Box>
-          ))}
-        </Box>
-      </Fragment>
+      
 
       {/* Modal for successful booking */}
       <Modal
