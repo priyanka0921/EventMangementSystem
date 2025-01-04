@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { Link } from "react-router-dom";
 import {
   Box,
@@ -35,7 +35,16 @@ const HomePage = () => {
       .catch((err) => console.log(err));
   }, []);
 
- 
+ // References for sections
+ const aboutRef = useRef(null);
+ const eventsRef = useRef(null);
+ const contactRef = useRef(null);
+
+ const scrollToSection = (ref) => {
+  ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+
 
   return (
     <Box width={'100%'} height={'auto'} marginTop={2}>
@@ -58,7 +67,7 @@ const HomePage = () => {
       </Box>
 
       {/* About Conference Section */}
-      <Box>
+      <Box ref={aboutRef}>
         <section>
           <Container sx={{ py: 4 }}>
             <Grid container spacing={4} alignItems="center">
@@ -114,7 +123,7 @@ const HomePage = () => {
       </Box>
 
       {/* Latest Events Section */}
-      <Box sx={{ bgcolor: 'grey.50', py: 8 }}>
+      <Box ref={eventsRef} sx={{ bgcolor: 'grey.50', py: 8 }}>
         <Container>
           <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
             Latest Events
@@ -132,7 +141,7 @@ const HomePage = () => {
               </Grid>
             ))}
           </Grid>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+          <Box  sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
             <Button
               variant="outlined"
               size="large"
@@ -147,7 +156,7 @@ const HomePage = () => {
       </Box>
 
       {/* Contact Us Section */}
-      <Box sx={{ width: '100%', py: 16, bgcolor: 'grey.100' }}>
+      <Box ref={contactRef} sx={{ width: '100%', py: 16, bgcolor: 'grey.100' }}>
         <Container>
           <Typography variant="h4" align="center" gutterBottom>
             Contact Us
@@ -270,10 +279,11 @@ const HomePage = () => {
             <Grid item xs={12} sm={6} md={3}>
               <Typography variant="h6" fontWeight="bold" gutterBottom>Quick Links</Typography>
               <List>
-                <ListItem><ListItemText primary="About Us" sx={{ color: 'textSecondary' }} /></ListItem>
-                <ListItem><ListItemText primary="Services" sx={{ color: 'textSecondary' }} /></ListItem>
-                <ListItem><ListItemText primary="Events" sx={{ color: 'textSecondary' }} /></ListItem>
-                <ListItem><ListItemText primary="Contact" sx={{ color: 'textSecondary' }} /></ListItem>
+                <ListItem button onClick={() => scrollToSection(aboutRef)}>
+                  <ListItemText primary="About Us" sx={{ color: 'textSecondary' }} /></ListItem>
+                <ListItem button onClick={() => scrollToSection(eventsRef)}><ListItemText primary="Services" sx={{ color: 'textSecondary' }} /></ListItem>
+                <ListItem button onClick={() => scrollToSection(eventsRef)}><ListItemText primary="Events" sx={{ color: 'textSecondary' }} /></ListItem>
+                <ListItem button onClick={() => scrollToSection(contactRef)}><ListItemText primary="Contact" sx={{ color: 'textSecondary' }} /></ListItem>
               </List>
             </Grid>
 

@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, Grid } from "@mui/material";
+import { Box, Button, TextField, Typography, Grid ,Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,} from "@mui/material";
 import { Link } from "react-router-dom";
 import { createEvent } from "../../api-helper/api_helper"; // Import the createEvent function
 
@@ -18,6 +21,8 @@ const CreateEventPage = () => {
     postedUrl: "",
     featured: false,
   });
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); 
+
   const formattedDate = formValues.releaseDate
     ? new Date(formValues.releaseDate).toLocaleDateString("en-US")
     : "";
@@ -54,14 +59,19 @@ const CreateEventPage = () => {
     createEvent(formValues)  // Sending form data to the backend
       .then((res) => {
         console.log("Event created successfully:", res);
+
+        setIsSuccessModalOpen(true); 
         // Optionally redirect or refresh after success
-        window.location.reload(); // Refresh the page after successful creation
+       // window.location.reload(); // Refresh the page after successful creation
       })
       .catch((err) => {
         console.error("Error creating event:", err);
       });
   };
-
+  const handleCloseModal = () => {
+    setIsSuccessModalOpen(false);
+    window.location.reload(); // Refresh the page after closing the modal
+  };
   return (
     <Box sx={{ maxWidth: 600, margin: "auto", mt: 4, px: 2 }}>
       <Typography variant="h4" align="center" gutterBottom>
@@ -203,7 +213,7 @@ const CreateEventPage = () => {
           </Grid>
         </Grid>
       </form>
-      <Button
+      {/* <Button
         variant="contained"
         color="secondary"
         LinkComponent={Link}
@@ -211,7 +221,28 @@ const CreateEventPage = () => {
         sx={{ mt: 2 }}
       >
         Discover Now
-      </Button>
+      </Button> */}
+       <Dialog open={isSuccessModalOpen} onClose={handleCloseModal}>
+        <DialogTitle>Success!</DialogTitle>
+        <DialogContent>
+          <Typography>
+            The event has been created successfully.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="primary">
+            Close
+          </Button>
+          <Button
+            component={Link}
+            to="/events"
+            color="secondary"
+            variant="contained"
+          >
+            View Events
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
