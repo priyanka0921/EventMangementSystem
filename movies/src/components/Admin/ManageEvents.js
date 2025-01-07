@@ -96,11 +96,7 @@ const ManageEvents = () => {
     }
   };
 
-  // Open event details modal
-  // const handleOpenDetails = (event) => {
-  //   setSelectedEvent(event);
-  //   setOpen(true);
-  // };
+
 
   // Close event details modal
   const handleCloseDetails = () => {

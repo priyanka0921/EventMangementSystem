@@ -17,7 +17,13 @@ const NotFound = () => {
       }}
     >
       <Typography variant="h1" sx={{ fontSize: { xs: "5rem", sm: "6rem" }, fontWeight: "bold", color: "#ff6f61" }}>
-        404
+      <Box
+    component="img"
+    src="https://heysummit-web.s3.us-east-1.amazonaws.com/post/127/1710499493827-570552456.png"
+    alt="Cat Sleeping on Keyboard"
+    sx={{ width: "100%", maxHeight: "200px", objectFit: "contain" }}
+  />
+
       </Typography>
       <Typography variant="h5" sx={{ mb: 2, color: "#555" }}>
         Oops! Page Not Found

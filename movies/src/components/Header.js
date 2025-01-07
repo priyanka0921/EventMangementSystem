@@ -10,13 +10,14 @@ import MenuIcon from "@mui/icons-material/Menu"; // Import the MenuIcon
 import MovieIcon from "@mui/icons-material/Movie";
 import { Box } from "@mui/system";
 import { getAllMovies } from '../api-helper/api_helper';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate,useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { adminActions, userActions } from "../components/store/index";
 
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
   const isAdminLoggedIn = useSelector((state) => state.admin.isLoggedIn);
   const isUserLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
@@ -45,22 +46,30 @@ const Header = () => {
       })
       .catch((err) => console.error("Error fetching movies:", err));
   }, []);
+  useEffect(() => {
+    if (location.pathname === "/events") setValue(0);
+    else if (location.pathname === "/auth") setValue(1);
+    else if (location.pathname === "/admin") setValue(2);
+    else if (location.pathname === "/user") setValue(3);
+    else if (location.pathname === "/dashboard") setValue(4);
+    else if (location.pathname === "/add") setValue(5);
+    else if (location.pathname === "/manage_events") setValue(6);
+    else if (location.pathname === "/user_admin") setValue(7);
+    else setValue(false); // Reset value for non-matching routes
+  }, [location.pathname]); // Run whenever location changes
+
+
+  const handleValueChange = (_e, val) => {
+    setValue(val); // Update the tab value
+  };
+
 
   const logout = (isAdmin) => {
     // Dispatch logout action based on user type
     dispatch(isAdmin ? adminActions.logout() : userActions.logout());
   };
 
-  // const handleChange = (_e, val) => {
-
-  //   const movie = movies.find((movie) => movie.title === val);
-  //   if (isUserLoggedIn) {
-  //     navigate(`/booking/${movie._id}`);
-  //   } else {
-  //     navigate("/auth");
-  //   }
-  //   console.log(movie);
-  // };
+  
   const handleChange = (_e, val) => {
     // Find the movie object based on the selected title
     const movie = movies.find((movie) => movie.title === val);
@@ -119,8 +128,13 @@ const Header = () => {
           />
         </Box>
         <Box sx={{ display: { xs: "none", md: "flex" } }}>
-          <Tabs textColor="inherit" indicatorColor='secondary'
-            onChange={(e, val) => setValue(val)} value={value}>
+        <Tabs
+            value={value}
+            onChange={handleValueChange}
+            textColor="inherit"
+            indicatorColor="secondary"
+          >
+
 
             <Tab LinkComponent={Link} to="/events" label="Events" />
 

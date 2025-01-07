@@ -59,7 +59,7 @@ const Bookings = () => {
             seatType: "premium"
           })
           setOpenModal(true); // Open the modal on successful booking
-          // setSnackbarOpen(true); // Open the snackbar on successful booking
+         
         })
         .catch(err => console.log(err));
     }

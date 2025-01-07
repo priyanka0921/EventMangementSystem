@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from "react-router-dom";
 import {
   Box,
@@ -52,14 +52,14 @@ const HomePage = () => {
       .catch((err) => console.log(err));
   }, []);
 
- // References for sections
- const aboutRef = useRef(null);
- const eventsRef = useRef(null);
- const contactRef = useRef(null);
+  // References for sections
+  const aboutRef = useRef(null);
+  const eventsRef = useRef(null);
+  const contactRef = useRef(null);
 
- const scrollToSection = (ref) => {
-  ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
+  const scrollToSection = (ref) => {
+    ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
 
 
@@ -75,11 +75,11 @@ const HomePage = () => {
         alignItems={'center'}
         paddingTop={-2}
       >
-             <img
-        src={images[currentIndex]}
-        alt={`Slide ${currentIndex + 1}`}
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-      />
+        <img
+          src={images[currentIndex]}
+          alt={`Slide ${currentIndex + 1}`}
+          style={{ width: "100%", height: "100%", objectFit: "cover" ,position:'sticky'}}
+        />
 
       </Box>
 
@@ -105,11 +105,10 @@ const HomePage = () => {
                     About Event Management
                   </Typography>
                   <Typography variant="body1" paragraph>
-                    When I first got into the online advertising business, I was looking for the magical
-                    combination that would put my website into the top search engine rankings, catapult me to
-                    the forefront of the minds or individuals looking to buy my product, and generally make me
-                    rich beyond my wildest dreams! After succeeding in the business for this long, I’m able to
-                    look back on my old self with this kind of thinking and shake my head.
+                    Event management refers to the process of planning, organizing, and executing events, which can range from small gatherings to large-scale conferences, concerts, festivals, or corporate events.
+                     It involves a systematic approach to ensure that all aspects of the event are efficiently coordinated to deliver a seamless and memorable experience for attendees.
+
+                    Event management typically combines creativity, logistics, and project management skills to achieve the desired goals of the event.
                   </Typography>
                   <List>
                     {[
@@ -126,10 +125,10 @@ const HomePage = () => {
                       </ListItem>
                     ))}
                   </List>
-                  <Button variant="contained" color="primary" 
-                  LinkComponent={Link} 
-                  to="/createEvent"
-                  sx={{ mt: 2 }}>
+                  <Button variant="contained" color="primary"
+                    LinkComponent={Link}
+                    to="/createEvent"
+                    sx={{ mt: 2 }}>
                     Create Event
                   </Button>
                 </Box>
@@ -158,7 +157,7 @@ const HomePage = () => {
               </Grid>
             ))}
           </Grid>
-          <Box  sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
             <Button
               variant="outlined"
               size="large"
@@ -251,7 +250,7 @@ const HomePage = () => {
             {/* Map */}
             <Grid item xs={12} md={6}>
               <Card>
-                <CardContent sx={{ padding: 1}}>
+                <CardContent sx={{ padding: 1 }}>
                   <Box
                     sx={{
                       width: '100%',
