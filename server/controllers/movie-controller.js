@@ -7,7 +7,7 @@ const Event = require('../models/Event');
 require("dotenv").config();
 module.exports = function (app, err) {
 
-    
+
     const addMovie = async (req, res, next) => {
         const extractedToken = req.headers.authorization.split(" ")[1];
 
@@ -27,7 +27,7 @@ module.exports = function (app, err) {
         });
 
         // Extract data from request body
-        const { title, description, releaseDate, location,time, postedUrl, featured, actors, price } = req.body;
+        const { title, description, releaseDate, location, time, postedUrl, featured, actors, price } = req.body;
 
         // Validate inputs
         if (
@@ -106,12 +106,12 @@ module.exports = function (app, err) {
         try {
             // Fetch all approved events
             const approvedEvents = await Event.find({ status: 'Approved' });
-            
+
             // Check if any events are approved
             if (approvedEvents.length === 0) {
                 return res.status(404).json({ message: "No approved events found" });
             }
-    
+
             // Iterate over the approved events to add them to the Movie collection
             for (const event of approvedEvents) {
                 // Check if the movie already exists in the database
@@ -135,22 +135,22 @@ module.exports = function (app, err) {
                         },
                         admin: event.createdBy, // Reference the admin who created the event
                     });
-    
+
                     // Save the movie to the database
                     await movie.save();
                 }
             }
-    
+
             // Now, fetch all movies (including the newly added ones)
             movies = await Movie.find();
-    
+
             return res.status(200).json({ movies });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message: "Server error while fetching movies" });
         }
     };
-    
+
 
     const getMovieIdById = async (req, res, next) => {
         const id = req.params.id;
@@ -173,12 +173,12 @@ module.exports = function (app, err) {
             const movies = await Movie.find();
 
             const approvedEvents = await Event.find({ status: "Approved" });
-    
+
             // If no movies or events are found, handle appropriately
             if (!movies.length && !approvedEvents.length) {
                 return res.status(404).json({ message: "No movies or approved events found" });
             }
-    
+
             return res.status(200).json({ movies, approvedEvents });
         } catch (err) {
             console.error(err);
@@ -188,21 +188,21 @@ module.exports = function (app, err) {
 
     const approveEvent = async (req, res, next) => {
         const { id } = req.params; // Event ID
-    
+
         try {
             // Fetch the event by ID
             const event = await Event.findById(id);
-    
+
             if (!event) {
                 return res.status(404).json({ message: "Event not found" });
             }
-    
+
             // Update event status to "Approved"
             event.status = "Approved";
-    
+
             // Save the updated event
             await event.save();
-    
+
             // Create a movie using the event data
             const movie = new Movie({
                 _id: event._id,  // Use the same ID as the event
@@ -221,10 +221,10 @@ module.exports = function (app, err) {
                 },
                 admin: event.createdBy, // Reference the admin who created the event
             });
-    
+
             // Save the movie
             await movie.save();
-    
+
             return res.status(200).json({
                 message: "Event approved and added to movies successfully",
                 event,
@@ -235,48 +235,48 @@ module.exports = function (app, err) {
             return res.status(500).json({ message: "Server error while approving event" });
         }
     };
-    
-    
 
-    app.put("/:id/approve", approveEvent); 
+
+
+    app.put("/:id/approve", approveEvent);
 
     const deleteMovie = async (req, res) => {
         const movieId = req.params.id;
-      
-        try {
-          // Find the movie by ID
-          const movie = await Movie.findById(movieId);
-          if (!movie) {
-            return res.status(404).json({ message: "Movie not found" });
-          }
-      
-          // Find the admin associated with the movie
-          const admin = await Admin.findById(movie.admin);
-          if (!admin) {
-            return res.status(404).json({ message: "Admin not found" });
-          }
-      
-          // Remove the movie from the admin's addedMovies array
-          admin.addedMovies.pull(movieId);
-          await admin.save();
-      
-          // Delete the movie's bookings if they exist
-          if (movie.bookings.length > 0) {
-            await mongoose.model("Bookings").deleteMany({ _id: { $in: movie.bookings } });
-          }
-      
-          // Delete the movie
-          await movie.deleteOne();
-      
-          res.status(200).json({ message: "Movie deleted successfully" });
-        } catch (err) {
-          console.error(err);
-          res.status(500).json({ message: "Failed to delete movie" });
-        }
-      };
-      
 
-      app.delete("/movie/:id", deleteMovie);
+        try {
+            // Find the movie by ID
+            const movie = await Movie.findById(movieId);
+            if (!movie) {
+                return res.status(404).json({ message: "Movie not found" });
+            }
+
+            // Find the admin associated with the movie
+            const admin = await Admin.findById(movie.admin);
+            if (!admin) {
+                return res.status(404).json({ message: "Admin not found" });
+            }
+
+            // Remove the movie from the admin's addedMovies array
+            admin.addedMovies.pull(movieId);
+            await admin.save();
+
+            // Delete the movie's bookings if they exist
+            if (movie.bookings.length > 0) {
+                await mongoose.model("Bookings").deleteMany({ _id: { $in: movie.bookings } });
+            }
+
+            // Delete the movie
+            await movie.deleteOne();
+
+            res.status(200).json({ message: "Movie deleted successfully" });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Failed to delete movie" });
+        }
+    };
+
+
+    app.delete("/movie/:id", deleteMovie);
 
 
 

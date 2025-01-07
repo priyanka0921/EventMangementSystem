@@ -2,20 +2,21 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getMoviesAndApprovedEvents, newBooking } from '../../api-helper/api_helper';
-import { Typography, Box, Button, RadioGroup, FormControlLabel, Radio, TextField, FormLabel, Modal } from '@mui/material';
+import { Typography, Box, Button, RadioGroup, FormControlLabel, Radio, TextField, FormLabel, Snackbar, Alert, Modal } from '@mui/material';
 
 const Bookings = () => {
- // const [events, setEvents] = useState([]); // Store approved events
+  // const [events, setEvents] = useState([]); // Store approved events
   const [movie, setMovie] = useState(null); // Store selected movie
   const [inputs, setInputs] = useState({ seatNumber: 1, date: "", seatType: "premium" });
   const [totalPrice, setTotalPrice] = useState(0);
   const [openModal, setOpenModal] = useState(false); // To manage modal visibility
   const [bookingDetails, setBookingDetails] = useState(null); // Store booking confirmation details
   const id = useParams().id; // Get the movie/event ID from the URL
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Control Snackbar visibility // Snackbar visibility
 
   useEffect(() => {
     getMoviesAndApprovedEvents().then((res) => {
-     // setEvents(res.approvedEvents); // Set approved events
+      // setEvents(res.approvedEvents); // Set approved events
       const selectedMovie = res.movies.find(movie => movie._id === id); // Find selected movie by ID
       setMovie(selectedMovie);
       if (selectedMovie) {
@@ -42,6 +43,7 @@ const Bookings = () => {
     if (movie) {
       newBooking({ ...inputs, movie: movie._id })
         .then((res) => {
+
           // Set the booking details and show the modal
           setBookingDetails({
             title: movie.title,
@@ -49,8 +51,15 @@ const Bookings = () => {
             totalPrice: totalPrice,
             date: inputs.date,
             postedUrl: movie.postedUrl
+
           });
+          setInputs({
+            seatNumber: 1,
+            date: "",
+            seatType: "premium"
+          })
           setOpenModal(true); // Open the modal on successful booking
+          // setSnackbarOpen(true); // Open the snackbar on successful booking
         })
         .catch(err => console.log(err));
     }
@@ -58,6 +67,19 @@ const Bookings = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const handleModalConfirm = () => {
+    setOpenModal(false);   // Close the Modal
+    setSnackbarOpen(true); // Show Snackbar
+  };
+
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false); // Close Snackbar
   };
 
   return (
@@ -74,7 +96,7 @@ const Bookings = () => {
               <Box width={"80%"} marginTop={3} padding={2}>
                 <Typography paddingTop={2}>{movie.description}</Typography>
                 <Typography fontWeight={"bold"} marginTop={1}>
-                  Starrer: {movie.actors.join(", ")}
+                  Host: {movie.actors.join(", ")}
                 </Typography>
                 <Typography fontWeight={"bold"} marginTop={1}>
                   Release Date: {new Date(movie.releaseDate).toDateString()}
@@ -113,8 +135,10 @@ const Bookings = () => {
       )}
 
       {/* Displaying approved events */}
+
       
 
+      {/* Modal for successful booking */}
       {/* Modal for successful booking */}
       <Modal
         open={openModal}
@@ -157,13 +181,28 @@ const Bookings = () => {
               <Typography variant="body1">
                 Booking Date: {new Date(bookingDetails.date).toDateString()}
               </Typography>
-              <Button variant="contained" color="primary" onClick={handleCloseModal} sx={{ mt: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleModalConfirm} // Call this function
+                sx={{ mt: 2 }}
+              >
                 Confirm
               </Button>
             </Fragment>
           )}
         </Box>
       </Modal>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+          Booking Successful! Movie has been added.
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

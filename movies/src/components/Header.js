@@ -93,7 +93,7 @@ const Header = () => {
   };
 
   return (
-    <AppBar position='fixed' sx={{ bgcolor: "#2b2d2b" }}>
+    <AppBar position='sticky' sx={{ bgcolor: "#2b2d2b" }}>
       <Toolbar sx={{ width: '99%' }}>
         <Box width={'20%'}>
           <IconButton LinkComponent={Link} to="/">
@@ -146,7 +146,7 @@ const Header = () => {
 
         {/* Hamburger Menu for smaller screens */}
         <Box sx={{ display: { xs: "block", md: "none" } }}>
-          <IconButton color="inherit" onClick={handleMenuOpen}>
+          <IconButton  sx={{marginLeft:'auto'}}color="inherit" onClick={handleMenuOpen}>
             <MenuIcon />
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>

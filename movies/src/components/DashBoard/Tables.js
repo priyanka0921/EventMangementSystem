@@ -71,7 +71,7 @@ export default function Tables() {
                 align="left"
                 sx={{ fontWeight: "bold", fontSize: "16px" }}
               >
-                Admin Email
+                Description
               </TableCell>
             </TableRow>
           </TableHead>
@@ -91,7 +91,7 @@ export default function Tables() {
                   {new Date(movie.releaseDate).toLocaleDateString()}
                 </TableCell>
                 <TableCell align="left">{movie.location}</TableCell>
-                <TableCell align="left">{movie.admin}</TableCell>
+                <TableCell align="left">{movie.description}</TableCell>
               </TableRow>
             ))}
           </TableBody>
