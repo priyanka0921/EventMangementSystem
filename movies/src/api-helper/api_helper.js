@@ -323,19 +323,7 @@ export const getAllBookings = async () => {
     }
 };
 
-// export const getEventById = async (id) => {
-//   const res = await axios.get(`/event/${id}`)
-//   .catch((err) => console.log(err));
-//   if (res.status !== 200) {
-//       return console.log("Unexpectyed Error");
-//   }
-//   const resData = await res.data;
-//   return resData;
-
-
-// }
-export 
-const approveEvent = async (eventId) => {
+export const approveEvent = async (eventId) => {
   try {
     const response = await axios.put(`/${eventId}/approve`);
     console.log("Event approved:", response.data);

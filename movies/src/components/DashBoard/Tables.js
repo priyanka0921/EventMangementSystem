@@ -53,7 +53,7 @@ export default function Tables() {
           <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold", fontSize: "16px" }}>
-                Movie
+                Event
               </TableCell>
               <TableCell
                 align="left"

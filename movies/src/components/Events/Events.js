@@ -1,35 +1,3 @@
-// import { Box, Typography } from '@mui/material';
-// import React, { useEffect, useState } from 'react'
-// import { getAllMovies } from '../../api-helper/api_helper';
-
-
-// import MovieItem from '../Movies/MovieItem';
-
-// const Events = () => {
-//   const [movies, setMovies] = useState([]);
-//   useEffect(() => {
-//     getAllMovies().then((data) => setMovies(data.movies))
-
-//       .catch(err => console.log(err));
-//   }, [])
-//   return (
-//     <Box margin={'auto'} marginTop={4}>
-//       <Typography variant='h4' margin={'auto'}
-//         padding={2} textAlign={'center'} width={'40%'} bgcolor={"#920C3F"}
-//         color='white'>
-//         All Events
-//       </Typography>
-
-//       <Box margin={'auto'} padding={2} width={'100%'} display={'flex'} justifyContent={'flex-start'} flexWrap={"wrap"}>
-//     {movies&&movies.map((movies,index)=><MovieItem key={index} id={movies._id} title={movies.title} releaseDate={movies.releaseDate} location={movies.location} postedUrl={movies.postedUrl} />)}
-//       </Box>
-//     </Box>
-//   )
-// }
-
-// export default Events;
-
-
 
 import { Box, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';

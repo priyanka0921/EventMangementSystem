@@ -7,9 +7,9 @@ import Cards from './Cards';
 const DashBoard = () => {
   return (
     <div>
-      
-      <Cards/>
-    <Tables/>
+
+      <Cards />
+      <Tables />
     </div>
   )
 }

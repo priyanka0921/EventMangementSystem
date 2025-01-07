@@ -1,4 +1,15 @@
-import { Box, Dialog, FormLabel, TextField, Typography, Button, IconButton } from '@mui/material';
+import {
+    Box,
+    FormLabel,
+    TextField,
+    Typography,
+    Button,
+    IconButton,
+    Card,
+    CardContent,
+    Snackbar,
+    Alert
+} from '@mui/material';
 import React, { useState } from 'react';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { Link } from 'react-router-dom';
@@ -10,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { userActions } from '../store/index';
 import axios from 'axios';
-const labelStyle = { mt: 1, mb: 2 };
+const labelStyle = { mt: 1, mb: 1, fontWeight: 'bold', color: '#333' };
 
 const AuthForm = ({ onSubmit, isAdmin }) => {
     const [inputs, setInputs] = useState({
@@ -20,9 +31,18 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
     });
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState('');
+    const [showSnackbar, setShowSnackbar] = useState(false);
+    const [isSignup, setisSignup] = useState(false);
     const isLoggedin = useSelector((state) => state.user.isLoggedIn);
     console.log(isLoggedin);
     const dispatch = useDispatch();
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setShowSnackbar(false);
+    };
     const handleChange = (e) => {
 
         setInputs((prevState) => ({
@@ -57,7 +77,7 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
 
         console.log(inputs);  // Log the inputs for debugging purposes
     }
-    const [isSignup, setisSignup] = useState(false);
+
 
 
     const handleGoogleSignIn = async () => {
@@ -96,102 +116,204 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
 
 
     return (
-        <Dialog PaperProps={{ style: { borderRadius: 20 } }} open={true}>
-            <Box sx={{ m1: "auto", padding: 2, display: "flex", justifyContent: "flex-end" }}>
-                <IconButton LinkComponent={Link} to="/">
-                    <CloseRoundedIcon />
-                </IconButton>
-            </Box>
-            <Typography
-                variant="h4"
-                margin={'auto'}
-                padding={3}
-                textAlign={'center'}
-                sx={{ color: "black", fontWeight: "bold" }}
-            >
-                {isSignup ? "Sign Up" : "Login"}
-            </Typography>
-            <form onSubmit={handleSubmit}>
-                <Box
-                    display={'flex'}
-                    justifyContent={'center'}
-                    flexDirection="column"
-                    width={400}
-                    margin={'auto'}
-                    sx={{ padding: 2 }}
-                    alignContent={"center"}
-                >
-
-                    {!isAdmin && isSignup && (<>
-                        {" "}
-                        <FormLabel sx={labelStyle}>Name</FormLabel>
-                        <TextField margin="normal" value={inputs.name} onChange={handleChange}
-                            variant="standard" type="text" name="name" placeholder="Enter Name" />
-
-                        
-                    </>)}
-
-                    <FormLabel sx={labelStyle}>Email</FormLabel>
-                    <TextField margin="normal"
-                        value={inputs.email} onChange={handleChange}
-                        variant="standard" type="email" name="email" placeholder="Enter Email" />
-
-                    <FormLabel sx={labelStyle}>Password</FormLabel>
-                    <TextField margin="normal" onChange={handleChange}
-                        value={inputs.password}
-                        variant="standard" type="password" name="password" placeholder="Enter Password" />
-
-                    {errorMessage && (
-                        <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
-                            {errorMessage}
-                        </Typography>
-                    )}
-                    <Button
-                        sx={{
-                            mt: 2,
-                            borderRadius: 2,
-                            bgcolor: "black",
-                            color: "white",
-                            ":hover": { bgcolor: "gray" },
-                        }}
-                        type="submit"
-                        variant="contained"
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+            <Card sx={{
+                maxWidth: 500, 
+                width: '100%',
+                borderRadius: 2, 
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                background: 'white',
+            }}>
+                <Box sx={{
+                    padding: 2,
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    borderBottom: '1px solid #eee'
+                }}>
+                    <IconButton
+                        component={Link}
+                        to="/"
+                        sx={{ color: 'text.secondary',
+                             marginBottom:'-19px'
+                         }}
                     >
-                        {isSignup ? "Sign Up" : "Login"}
-                    </Button>
-                    {!isAdmin && (
-                        <Button
-                            onClick={() => setisSignup(!isSignup)}
-                            sx={{ mt: 2, borderRadius: 10 }}
-                            fullWidth
-                        >
-                            Switch To {isSignup ? "Login" : "Signup"}
-                        </Button>
-                    )}
-                    {!isAdmin && (
-                        <>
-                            <Box></Box><Button
-                                onClick={handleGoogleSignIn}
+                        <CloseRoundedIcon />
+                    </IconButton>
+                </Box>
+
+                <Typography
+                    variant="h5"
+                    padding={2}
+                    textAlign='center'
+                    sx={{
+                        color: "primary.main",
+                        fontWeight: "bold",
+                        fontSize: '1.4rem',
+                        marginBottom:'-17px'
+                    }}
+                >
+                    {isSignup ? "Create Account" : "Welcome Back"}
+                </Typography>
+
+                <CardContent sx={{ padding: 2 }}>
+                    <form onSubmit={handleSubmit}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {!isAdmin && isSignup && (
+                                <>
+                                    <FormLabel sx={labelStyle}>Name</FormLabel>
+                                    <TextField
+                                        fullWidth
+                                        size='small'
+                                        value={inputs.name}
+                                        onChange={handleChange}
+                                        variant="outlined"
+                                        type="text"
+                                        name="name"
+                                        placeholder="Enter your name"
+                                        sx={{ mb:0}}
+                                    />
+                                </>
+                            )}
+
+                            <FormLabel sx={labelStyle}>Email</FormLabel>
+                            <TextField
+                                fullWidth
+                                size='small'
+                                value={inputs.email}
+                                onChange={handleChange}
                                 variant="outlined"
-                                startIcon={<GoogleIcon />}
+                                type="email"
+                                name="email"
+                                placeholder="Enter your email"
+                                sx={{ mt:0}}
+                            />
+
+                            <FormLabel sx={labelStyle}>Password</FormLabel>
+                            <TextField
+                                fullWidth
+                                size='small'
+                                value={inputs.password}
+                                onChange={handleChange}
+                                variant="outlined"
+                                type="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                sx={{ mb: 3 }}
+                            />
+
+                            <Button
+                                fullWidth
+                                type="submit"
+                                variant="contained"
                                 sx={{
-                                    mt: 2,
-                                    borderRadius: 2,
-                                    color: "#DB4437", // Google's red color
-                                    borderColor: "#DB4437",
-                                    ":hover": {
-                                        bgcolor: "rgba(219, 68, 55, 0.1)",
+                                    py: 1,
+                                    textTransform: 'none',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 600,
+                                    borderRadius: 5,
+                                    mt:'-23px',
+                                    backgroundColor: 'primary.main',
+                                    '&:hover': {
+                                        backgroundColor: 'primary.dark',
+                                        fontWeight:'bold'
                                     },
                                 }}
-                                fullWidth
                             >
-                                Sign in with Google
+                                {isSignup ? "Sign Up" : "Login"}
                             </Button>
-                        </>
-                    )}
-                </Box>
-            </form>
-        </Dialog>
+
+                            {!isAdmin && (
+                                <>
+                                    <Button
+                                        onClick={() => setisSignup(!isSignup)}
+                                        sx={{
+                                           // mt: 0.5,
+                                            mt:'-21px',
+                                            textTransform: 'none',
+                                            color: 'text.secondary',
+                                            fontSize: '0.8rem',
+                                            fontWeight:'bold'
+                                        }}
+                                    >
+                                        {isSignup
+                                            ? "Already have an account? Login"
+                                            : "Don't have an account? Sign Up"}
+                                    </Button>
+
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        my: 1
+                                    }}>
+                                        <Box sx={{ flex: 1, borderTop: '1px solid #eee',mt:'-23px' }} />
+                                        <Typography sx={{ mx: 2, color: 'text.secondary', fontSize: '1rem', mt:'-25px' }}>
+                                            or
+                                        </Typography>
+                                        <Box sx={{ flex: 1, borderTop: '1px solid #eee',mt:'-23px' }} />
+                                    </Box>
+
+                                    <Button
+                                        fullWidth
+                                        size="small"
+                                        onClick={handleGoogleSignIn}
+                                        variant="outlined"
+                                        startIcon={<GoogleIcon sx={{ fontSize: 18 }} />}
+                                        sx={{
+                                            py: 1,
+                                            textTransform: 'none',
+                                            fontSize: '0.9rem',
+                                            borderColor: '#DB4437',
+                                            color: '#DB4437',
+                                            mt:'-22px',
+                                            '&:hover': {
+                                                borderColor: '#DB4437',
+                                                backgroundColor: 'rgba(219, 68, 55, 0.04)',
+                                            },
+                                        }}
+                                    >
+                                        Sign in with Google
+                                    </Button>
+                                </>
+                            )}
+                        </Box>
+                    </form>
+                </CardContent>
+            </Card>
+
+            <Snackbar
+                open={showSnackbar}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity="success"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    Successfully logged in!
+                </Alert>
+            </Snackbar>
+
+            {errorMessage && (
+                <Snackbar
+                    open={!!errorMessage}
+                    autoHideDuration={6000}
+                    onClose={() => setErrorMessage('')}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    <Alert
+                        onClose={() => setErrorMessage('')}
+                        severity="error"
+                        variant="filled"
+                        sx={{ width: '100%' }}
+                    >
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
+            )}
+        </Box>
     );
 };
 
