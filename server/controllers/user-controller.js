@@ -154,9 +154,10 @@ const googleLogin = async (req, res, next) => {
   }
 
   let existingUser;
+
   try {
     // Check if the user already exists
-    existingUser = await User.findOne({ email });
+    existingUser = await User.findOne({ email :email.toLowerCase()});
   } catch (err) {
     return res.status(500).json({ message: "Database query failed." });
   }
@@ -171,36 +172,137 @@ const googleLogin = async (req, res, next) => {
   }
 
   // If the user doesn't exist, create a new user
-  let newUser;
-  try {
-    newUser = new User({ name, email, password: null }); // No password for Google sign-in
-    newUser = await newUser.save();
-  } catch (err) {
-    return res.status(500).json({ message: "Failed to create user." });
-  }
-
+  const newUser= new User({
+    name, email:email.toLowerCase(), password: null
+  })
+  const savedUser= await newUser.save();
   return res.status(201).json({
     message: "User created successfully via Google.",
-    id: newUser._id,
-    user: newUser,
+    id: savedUser._id,
+    user: savedUser,
   });
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 app.post("/users/google-login", googleLogin);
+
+
+
+
+
+const facebookLogin = async (req, res, next) => {
+  const { email, name } = req.body;
+
+  // Validate inputs
+  if (!email || !name || email.trim() === "" || name.trim() === "") {
+      return res.status(422).json({ message: "Invalid inputs." });
+  }
+
+  let existingUser;
+
+  try {
+      // Check if the user already exists
+      existingUser = await User.findOne({ email: email.toLowerCase() });
+  } catch (err) {
+      return res.status(500).json({ message: "Database query failed." });
+  }
+
+  if (existingUser) {
+      // If the user exists, return a success message
+      return res.status(200).json({
+          message: "User logged in successfully via Facebook.",
+          id: existingUser._id,
+          user: existingUser,
+      });
+  }
+
+  // If the user doesn't exist, create a new user
+  const newUser = new User({
+      name,
+      email: email.toLowerCase(),
+      password: null, // For OAuth-based logins like Google/Facebook, no password is needed
+  });
+
+  const savedUser = await newUser.save();
+  return res.status(201).json({
+      message: "User created successfully via Facebook.",
+      id: savedUser._id,
+      user: savedUser,
+  });
+};
+
+// API endpoint to handle Facebook login
+app.post("/users/facebook-login", facebookLogin);
+
+
+const setPassword = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+      return res.status(422).json({ message: "Email or Password is missing." });
+  }
+
+  try {
+      let user = await User.findOne({ email: email.toLowerCase() });
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found." });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      user.password = hashedPassword;
+      await user.save();
+
+      res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+      console.error("Error updating password:", err);
+      res.status(500).json({ message: "Error updating password." });
+  }
+
+};
+
+// Route to handle password update
+app.post("/users/set-password", setPassword);
+
+
+
+app.post("/users/set-password", setPassword);
+
+
+const getUserDetails = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+      // Find the user by userId
+      const user = await User.findById(userId);
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found." });
+      }
+
+      // Return the user details (including their Google/Facebook data)
+      return res.status(200).json({
+          message: "User found.",
+          user: {
+              id: user._id,
+              name: user.name,
+              email: user.email,
+              password: user.password ? "Password set" : "Password not set",
+              googleAuth: user.googleAuth ? user.googleAuth : null,
+              facebookAuth: user.facebookAuth ? user.facebookAuth : null,
+              bookings: user.bookings,
+              createdEvents: user.createdEvents,
+          },
+      });
+  } catch (error) {
+      return res.status(500).json({ message: "Failed to fetch user details." });
+  }
+};
+
+app.get("/users/:userId/details", getUserDetails);
+
+
 
   app.get("/user/:id", getUserById)
   app.get("/bookings/:id", getBookingsOfUser)

@@ -17,6 +17,7 @@ import DashBoard from "./components/DashBoard/DashBoard";
 import NotFound from "./components/Error/NotFound";
 import CreateEventPage from "./components/Events/CreateEventPage";
 import ManageEvents from "./components/Admin/ManageEvents";
+import PasswordField from "./components/Auth/PasswordField";
 function App() {
   const dispatch = useDispatch();
   const isAdminLoggedIn = useSelector((state) => state.admin.isLoggedIn);
@@ -61,6 +62,7 @@ function App() {
           </>)}
           <Route path="*" element={<NotFound />}/>
          <Route path="/createEvent" element={<CreateEventPage />} />
+         <Route path="/set-password" element={<PasswordField/>} />
         </Routes>
       </section>
     </div>

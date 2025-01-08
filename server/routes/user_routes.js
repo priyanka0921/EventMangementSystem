@@ -7,8 +7,10 @@ const deleteUser = require('../controllers/user-controller');
 const login = require('../controllers/user-controller');
 const getBookingsOfUser = require('../controllers/user-controller');
 const getUserById = require('../controllers/user-controller');
-
+const facebookLogin= require('../controllers/user-controller');
  const googleLogin = require('../controllers/user-controller');
+ const setPassword= require('../controllers/user-controller');
+ const getUserDetails=require('../controllers/user-controller');
 module.exports = function (app, err) {
     const userRouter = express.Router();
 
@@ -20,10 +22,10 @@ module.exports = function (app, err) {
     userRouter.get("/bookings/:id", getBookingsOfUser);
     userRouter.post("/login", login);
     userRouter.get("user/:id",getUserById);
-
-
+   userRouter.post("/users/facebook-login", facebookLogin);
+userRouter.post("/users/set-password", setPassword);
     userRouter.post("/users/google-login", googleLogin);
-
+userRouter.get("/users/:userId/details", getUserDetails);
     // Use the userRouter for the "/users" route
     app.use("/users", userRouter);
 };
