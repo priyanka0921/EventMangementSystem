@@ -51,9 +51,6 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
     };
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
-
-
-
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -82,12 +79,6 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
         }
     };
 
-
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     onSubmit({ inputs, signup: isAdmin ? false : isSignup });
-    //     console.log(inputs);
-    // }
     const validatePassword = (password) => {
         // Ensure the password is at least 6 characters long and contains both alphabetic characters and numbers
         const regex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
@@ -97,6 +88,11 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+
+        if ((!isAdmin && isSignup && !inputs.name) || !inputs.email || !inputs.password) {
+            setErrorMessage("All fields are mandatory. Please fill in all the details.");
+            return;
+        }
         // Validate the password before submission
         if (!validatePassword(inputs.password)) {
             setErrorMessage("Password must be at least 6 characters long and contain both letters and numbers.");
@@ -298,6 +294,7 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
                                 name="email"
                                 placeholder="Enter your email"
                                 sx={{ mt: 0 }}
+                                autoComplete="off"
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
