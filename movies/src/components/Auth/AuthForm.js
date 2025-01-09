@@ -17,12 +17,15 @@ import GoogleIcon from '@mui/icons-material/Google'; // Import Google icon for t
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import FacebookIcon from '@mui/icons-material/Facebook';
-
-import { auth, googleProvider,facebookProvider } from "../../firebaseConfig";
+import EmailIcon from '@mui/icons-material/Email'; // Icon for email
+import LockIcon from '@mui/icons-material/Lock';   // Icon for password
+import { auth, googleProvider, facebookProvider } from "../../firebaseConfig";
 import { signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { userActions } from '../store/index';
+import { InputAdornment } from '@mui/material';
+
 import axios from 'axios';
 const labelStyle = { mt: 1, mb: 1, fontWeight: 'bold', color: '#333' };
 
@@ -38,12 +41,16 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [showSnackbar, setShowSnackbar] = useState(false);
     const [isSignup, setisSignup] = useState(false);
+    const [error, setError] = useState(false);
+
     const isLoggedin = useSelector((state) => state.user.isLoggedIn);
     console.log(isLoggedin);
     const dispatch = useDispatch();
     const togglePasswordVisibility = () => {
         setShowPassword((prevShowPassword) => !prevShowPassword);
     };
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
 
 
 
@@ -60,6 +67,21 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
             [e.target.name]: e.target.value,
         }))
     }
+    const handleEmailChange = (e) => {
+        const value = e.target.value;
+        setInputs((prevState) => ({
+            ...prevState,
+            email: value,
+        }));
+
+        // Check if the email does not end with "@gmail.com"
+        if (value && !gmailRegex.test(value)) {
+            setError(true); // Show error popup
+        } else {
+            setError(false); // Hide error popup
+        }
+    };
+
 
     // const handleSubmit = (e) => {
     //     e.preventDefault();
@@ -78,6 +100,10 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
         // Validate the password before submission
         if (!validatePassword(inputs.password)) {
             setErrorMessage("Password must be at least 6 characters long and contain both letters and numbers.");
+            return;
+        }
+        if (!inputs.email || error) {
+            setErrorMessage("Please enter a valid Gmail ID.");
             return;
         }
 
@@ -134,19 +160,19 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
         try {
             const result = await signInWithPopup(auth, facebookProvider);
             const user = result.user;
-    
+
             console.log("Facebook Sign-In successful:", user);
-    
+
             // Send user data and access token to the backend
             const response = await axios.post("http://localhost:5000/users/facebook-login", {
                 email: user.email,
                 name: user.displayName,
                 accessToken: user.stsTokenManager.accessToken, // Send the access token
             });
-    
+
             if (response.status === 200 || response.status === 201) {
                 console.log("User logged in via Facebook:", response.data);
-    
+
                 // Save user details to localStorage or context
                 localStorage.setItem("userId", response.data.id);
                 localStorage.setItem("accessToken", user.stsTokenManager.accessToken);
@@ -162,21 +188,21 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
             setErrorMessage("Facebook Sign-In failed. Please try again.");
         }
     };
-    
+
     // const handleFacebookSignIn = async () => {
     //     try {
     //         const result = await signInWithPopup(auth, facebookProvider);
     //         const user = result.user;
-    
+
     //         console.log("Facebook Sign-In successful:", user);
-    
+
     //         // Send user data to backend to check if they have a password
     //         const response = await axios.post("http://localhost:5000/users/facebook-login", {
     //             email: user.email,
     //             name: user.displayName,
     //             accessToken: user.stsTokenManager.accessToken, // Send the access token
     //         });
-    
+
     //         if (response.status === 200 || response.status === 201) {
     //             const userData = response.data.user;
     //             localStorage.setItem("userEmail", user.email);
@@ -198,7 +224,7 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
     //         setErrorMessage("Facebook Sign-In failed. Please try again.");
     //     }
     // };
-    
+
 
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
@@ -266,13 +292,34 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
                                 fullWidth
                                 size='small'
                                 value={inputs.email}
-                                onChange={handleChange}
+                                onChange={handleEmailChange}
                                 variant="outlined"
                                 type="email"
                                 name="email"
                                 placeholder="Enter your email"
                                 sx={{ mt: 0 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <EmailIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+
                             />
+                            {error && (
+                                <div
+                                    style={{
+                                        marginTop: "10px",
+                                        padding: "10px",
+                                        color: "white",
+                                        backgroundColor: "red",
+                                        borderRadius: "5px",
+                                    }}
+                                >
+                                    Please enter a valid Gmail ID (e.g., example@gmail.com)
+                                </div>
+                            )}
 
                             <FormLabel sx={labelStyle}>Password</FormLabel>
                             <Box sx={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -285,17 +332,30 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
                                     type={showPassword ? "text" : "password"} // Toggle between text and password
                                     name="password"
                                     placeholder="Enter your password"
-                                />
-                                <IconButton
-                                    onClick={togglePasswordVisibility}
-                                    sx={{
-                                        position: "absolute",
-                                        right: 10, // Inside the field
-                                        color: "gray",
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <LockIcon />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+
+                                                <IconButton
+                                                    onClick={togglePasswordVisibility}
+                                                    sx={{
+                                                        position: "absolute",
+                                                        right: 10, // Inside the field
+                                                        color: "gray",
+                                                    }}
+                                                >
+                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
                                     }}
-                                >
-                                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                                </IconButton>
+                                />
+
                             </Box>
 
                             <Button
@@ -371,27 +431,27 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
                                         Sign in with Google
                                     </Button>
                                     <Box>
-                                    <Button
-                                        fullWidth
-                                        size="small"
-                                        onClick={handleFacebookSignIn}
-                                        variant="outlined"
-                                        startIcon={<FacebookIcon sx={{ fontSize: 18 }} />}
-                                        sx={{
-                                            py: 1,
-                                            textTransform: 'none',
-                                            fontSize: '0.9rem',
-                                            borderColor: '#DB4437',
-                                            color: '#DB4437',
-                                            mt: '-22px',
-                                            '&:hover': {
+                                        <Button
+                                            fullWidth
+                                            size="small"
+                                            onClick={handleFacebookSignIn}
+                                            variant="outlined"
+                                            startIcon={<FacebookIcon sx={{ fontSize: 18 }} />}
+                                            sx={{
+                                                py: 1,
+                                                textTransform: 'none',
+                                                fontSize: '0.9rem',
                                                 borderColor: '#DB4437',
-                                                backgroundColor: 'rgba(219, 68, 55, 0.04)',
-                                            },
-                                        }}
-                                    >
-                                        Sign in with FaceBook
-                                    </Button>
+                                                color: '#DB4437',
+                                                mt: '-22px',
+                                                '&:hover': {
+                                                    borderColor: '#DB4437',
+                                                    backgroundColor: 'rgba(219, 68, 55, 0.04)',
+                                                },
+                                            }}
+                                        >
+                                            Sign in with FaceBook
+                                        </Button>
                                     </Box>
                                 </>
                             )}
