@@ -82,112 +82,143 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
 
     const validatePassword = (password) => {
         // Ensure the password is at least 6 characters long and contains both alphabetic characters and numbers
-        const regex = /^(?=.*[A-Z)(?=.*A-Z])(?=.*\d).{6,}$/;
+        const regex = /^(?=.*[A-Z]*[a-zA-Z])(?=.*\d).{6,}$/;
         return regex.test(password);
     };
 
-
+  
     // const handleSubmit = async (e) => {
     //     e.preventDefault();
-    //     if (!isAdmin && isSignup && !inputs.name) {
-    //         setErrorMessage("Please enter your name");
+    
+    //     // Validate all fields for signup
+    //     if ((!isAdmin && isSignup && !inputs.name) || !inputs.email || !inputs.password) {
+    //         setErrorMessage("All fields are mandatory. Please fill in all the details.");
     //         return;
     //     }
-
-    //     if (!inputs.email) {
-    //         setErrorMessage("Please enter your email address");
-    //         return;
-    //     }
-
-    //     if (error) { // email format error
-    //         setErrorMessage("Please enter a valid Gmail ID (example@gmail.com)");
-    //         return;
-    //     }
-
-    //     if (!inputs.password) {
-    //         setErrorMessage("Please enter your password");
-    //         return;
-    //     }
+    
+    //     // Validate the password
     //     if (!validatePassword(inputs.password)) {
-    //         setErrorMessage("Password must contain at least 6 characters, including letters and numbers");
+    //         setErrorMessage("Password must be at least 6 characters long, contain at least one uppercase letter, and one number.");
     //         return;
     //     }
-    //     // Simulate calling the onSubmit prop function and awaiting a response
+    
+    //     if (!inputs.email || error) {
+    //         setErrorMessage("Please enter a valid Gmail ID.");
+    //         return;
+    //     }
+    
     //     try {
     //         const response = await onSubmit({ inputs, signup: isAdmin ? false : isSignup });
-    //         console.log("response", response);
-    //         console.log(response); // Full response
-    //         console.log(response.data); // Data inside response (typical for axios)
-    //         console.log(response.status); // Status code
-
-    //         if (response.status === 200) {
-    //             setErrorMessage(""); // Clear error message
-    //             // Handle success (e.g., redirect or store user data)
+    
+    //         if (response && !response.success) {
+    //             setErrorMessage(response.message || "An error occurred. Please try again.");
     //         } else {
-    //             // If response is not successful, show the error message from API
-    //             setErrorMessage(response.data.message || "An error occurred. Please try again.");
+    //             setErrorMessage("");
+    
+    //             if (isSignup) {
+    //                 // After successful signup, switch to login mode
+    //                 setisSignup(false);
+    //                 setInputs({ email: "", password: "" }); // Clear inputs for login
+    //                 setErrorMessage("Signup successful. Please log in.");
+    //             } else {
+    //                 // Redirect after successful login
+    //                 navigate("/");
+    //             }
     //         }
-
-
     //     } catch (error) {
-    //         // Handle any unexpected errors (e.g., network issues)
-    //         setErrorMessage(error.response?.data?.message || "An unexpected error occurred.");
+    //         setErrorMessage("An unexpected error occurred.");
     //     }
+    // };
 
-    //     console.log(inputs);  // Log the inputs for debugging purposes
-    // }
     const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Input validation
-    if (!isAdmin && isSignup && !inputs.name) {
-        setErrorMessage("Please enter your name");
-        return;
-    }
-
-    if (!inputs.email) {
-        setErrorMessage("Please enter your email address");
-        return;
-    }
-
-    if (error) { // email format error
-        setErrorMessage("Please enter a valid Gmail ID (example@gmail.com)");
-        return;
-    }
-
-    if (!inputs.password) {
-        setErrorMessage("Please enter your password");
-        return;
-    }
-
-    if (!validatePassword(inputs.password)) {
-        setErrorMessage("Password must contain at least 6 characters, including letters and numbers");
-        return;
-    }
-
-    // Log inputs and signup status for debugging
-    console.log("Inputs being sent:", inputs);
-    console.log("Is Admin:", isAdmin);
-    console.log("Is Signup:", isSignup);
-
-    try {
-        const response = await onSubmit({ inputs, signup: isAdmin ? false : isSignup });
-        
-        if (response && !response.success) {
-            // If the response indicates failure, set the error message
-            setErrorMessage(response.message || "An error occurred. Please try again.");
-        } else {
-            // Clear the error message if the login/signup is successful
-            setErrorMessage("");
+        e.preventDefault();
+    
+        // Reset error messages
+        setErrorMessage('');
+        setShowSnackbar(false);
+    
+        // Specific field validation
+        if (!isAdmin && isSignup && !inputs.name) {
+            setErrorMessage("Please enter your name");
+            return;
         }
-        
-    } catch (error) {
-        // Handle any unexpected errors (e.g., network issues)
-        setErrorMessage("An unexpected error occurred.");
-    }
+    
+        if (!inputs.email) {
+            setErrorMessage("Please enter your email address");
+            return;
+        }
+    
+        if (error) { // email format error
+            setErrorMessage("Please enter a valid Gmail ID (example@gmail.com)");
+            return;
+        }
+    
+        if (!inputs.password) {
+            setErrorMessage("Please enter your password");
+            return;
+        }
+    
+        if (!validatePassword(inputs.password)) {
+            setErrorMessage("Password must contain at least 6 characters, including letters and numbers");
+            return;
+        }
+    
+        try {
+            const response = await onSubmit({ inputs, signup: isAdmin ? false : isSignup });
+            
+            // Handle API responses
+            if (response.status === 400) {
+                // Handle existing account
+                if (response.data.isUserRegistered && response.data.shouldLogin) {
+                    setErrorMessage("Account already exists with these credentials. Please login instead.");
+                    setisSignup(false);
+                    setInputs({ ...inputs, password: "" });
+                } 
+                // Handle different password
+                else if (response.data.message === "Email already registered with a different password.") {
+                    setErrorMessage("This email is already registered with a different password.");
+                }
+            } 
+            // Handle account not found
+            else if (response.status === 404) {
+                setErrorMessage("No account found with this email. Please sign up first.");
+                setisSignup(true);
+                setInputs({ name: "", email: inputs.email, password: "" });
+            } 
+            // Handle incorrect password
+            else if (response.data?.isUserRegistered && !response.data?.passwordMatch) {
+                setErrorMessage("Incorrect password. Please try again.");
+            }
+            // Handle other errors
+            else if (!response.success) {
+                setErrorMessage(response.message || "An error occurred. Please try again.");
+            } 
+            // Handle success
+            else {
+                if (isSignup) {
+                    setisSignup(false);
+                    setInputs({ name: "", email: "", password: "" });
+                    setShowSnackbar(true);
+                    setErrorMessage("Signup successful! Please log in.");
+                } else {
+                    dispatch(userActions.login());
+                    navigate("/");
+                    setShowSnackbar(true);
+                }
+            }
+        } catch (error) {
+            // Handle specific API error messages if available
+            if (error.response?.data?.message) {
+                setErrorMessage(error.response.data.message);
+            } 
+            // Handle network or other errors
+            else {
+                setErrorMessage("Unable to connect to server. Please check your internet connection and try again.");
+            }
+        }
+    };
 
-    console.log(inputs);  // Log the inputs for debugging purposes
-};
+
 
 
     const handleGoogleSignIn = async () => {
@@ -223,39 +254,6 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
         }
     };
 
-    // const handleFacebookSignIn = async () => {
-    //     try {
-    //         const result = await signInWithPopup(auth, facebookProvider);
-    //         const user = result.user;
-
-    //         console.log("Facebook Sign-In successful:", user);
-
-    //         // Send user data and access token to the backend
-    //         const response = await axios.post("http://localhost:5000/users/facebook-login", {
-    //             email: user.email,
-    //             name: user.displayName,
-    //             accessToken: user.stsTokenManager.accessToken, // Send the access token
-    //         });
-
-    //         if (response.status === 200 || response.status === 201) {
-    //             console.log("User logged in via Facebook:", response.data);
-
-    //             // Save user details to localStorage or context
-    //             localStorage.setItem("userId", response.data.id);
-    //             localStorage.setItem("accessToken", user.stsTokenManager.accessToken);
-    //             dispatch(userActions.login());
-    //             // Redirect to home page
-    //             navigate("/");
-    //         } else {
-    //             console.error("Facebook Login Error:", response.data.message);
-    //             setErrorMessage(response.data.message || "Facebook Login failed.");
-    //         }
-    //     } catch (error) {
-    //         console.log("Facebook Sign-In error:", error.message);
-    //         setErrorMessage("Facebook Sign-In failed. Please try again.");
-    //     }
-    // };
-
     const handleFacebookSignIn = async () => {
         try {
             const result = await signInWithPopup(auth, facebookProvider);
@@ -263,7 +261,7 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
 
             console.log("Facebook Sign-In successful:", user);
 
-            // Send user data to backend to check if they have a password
+            // Send user data and access token to the backend
             const response = await axios.post("http://localhost:5000/users/facebook-login", {
                 email: user.email,
                 name: user.displayName,
@@ -271,18 +269,14 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
             });
 
             if (response.status === 200 || response.status === 201) {
-                const userData = response.data.user;
-                localStorage.setItem("userEmail", user.email);
-                localStorage.setItem("userId", userData._id);
-                // If password is null, redirect to password setup page
-                if (!userData.password) {
+                console.log("User logged in via Facebook:", response.data);
 
-                    navigate("/set-password", { state: { userId: userData.id, email: user.email } });
-                } else {
-                    // If password exists, proceed to the home page
-                    dispatch(userActions.login({ email: user.email, isLoggedIn: true }));
-                    navigate("/");
-                }
+                // Save user details to localStorage or context
+                localStorage.setItem("userId", response.data.id);
+                localStorage.setItem("accessToken", user.stsTokenManager.accessToken);
+                dispatch(userActions.login());
+                // Redirect to home page
+                navigate("/");
             } else {
                 console.error("Facebook Login Error:", response.data.message);
                 setErrorMessage(response.data.message || "Facebook Login failed.");
@@ -292,6 +286,42 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
             setErrorMessage("Facebook Sign-In failed. Please try again.");
         }
     };
+
+    // const handleFacebookSignIn = async () => {
+    //     try {
+    //         const result = await signInWithPopup(auth, facebookProvider);
+    //         const user = result.user;
+
+    //         console.log("Facebook Sign-In successful:", user);
+
+    //         // Send user data to backend to check if they have a password
+    //         const response = await axios.post("http://localhost:5000/users/facebook-login", {
+    //             email: user.email,
+    //             name: user.displayName,
+    //             accessToken: user.stsTokenManager.accessToken, // Send the access token
+    //         });
+
+    //         if (response.status === 200 || response.status === 201) {
+    //             const userData = response.data.user;
+    //             localStorage.setItem("userEmail", user.email);
+
+    //             // If password is null, redirect to password setup page
+    //             if (!userData.password) {
+    //                 navigate("/set-password", { state: { userId: userData.id } });
+    //             } else {
+    //                 // If password exists, proceed to the home page
+    //                 dispatch(userActions.login());
+    //                 navigate("/");
+    //             }
+    //         } else {
+    //             console.error("Facebook Login Error:", response.data.message);
+    //             setErrorMessage(response.data.message || "Facebook Login failed.");
+    //         }
+    //     } catch (error) {
+    //         console.log("Facebook Sign-In error:", error.message);
+    //         setErrorMessage("Facebook Sign-In failed. Please try again.");
+    //     }
+    // };
 
 
     return (
@@ -454,7 +484,7 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
                                         onClick={() => setisSignup(!isSignup)}
                                         sx={{
                                             // mt: 0.5,
-                                            mt: '0px',
+                                            mt: '-21px',
                                             textTransform: 'none',
                                             color: 'text.secondary',
                                             fontSize: '0.8rem',
@@ -554,7 +584,8 @@ const AuthForm = ({ onSubmit, isAdmin }) => {
                 >
                     <Alert
                         onClose={() => setErrorMessage('')}
-                        severity="error"
+                        severity={errorMessage.includes("successful") ? "success" : "error"}
+
                         variant="filled"
                         sx={{ width: '100%' }}
                     >

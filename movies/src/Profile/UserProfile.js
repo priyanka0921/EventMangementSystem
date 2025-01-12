@@ -12,7 +12,9 @@ const UserProfile = () => {
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-
+    if (!userId) {
+      console.log("User ID is missing from localStorage");
+  }
     // Fetch user bookings
     getUserBooking()
       .then((res) => setBookings(res.bookings))

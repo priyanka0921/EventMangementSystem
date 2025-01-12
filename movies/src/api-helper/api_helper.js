@@ -34,19 +34,21 @@ export const getApprovedEvents = async () => {
 export const sendUserAuthRequest = async (data, signup) => {
     try {
         const res = await axios.post(`/users/${signup ? "signup" : "login"}`, {
-            name: signup ? data.name : "",
+            name: signup ? data.name : undefined,
             email: data.email,
             password: data.password,
         });
 
         if (res.status !== 200 && res.status !== 201) {
+          console.log("response",res);
             throw new Error("Unexpected error occurred");
         }
 
         return res.data;
     } catch (err) {
         // Pass the error to the caller
-        throw new Error(err.response?.data?.message || "User not found");
+        const errorMessage = err.response?.data?.message || "User not found"
+        throw new Error(errorMessage);
     }
 };
 
@@ -123,15 +125,40 @@ export const getUserBooking = async () => {
     const resData = await res.data;
     return resData;
 };
+// export const getUserDetails = async () => {
+//     const id = localStorage.getItem("userId");
+//     const res = await axios.get(`/user/${id}`)
+//     .catch((err) => console.log(err));
+//     console.log(res.data);
+//     if (res.status !== 200) {
+//         return console.log("Unexpected Error");
+//     }
+//     const resData = await res.data;
+//     return resData;
+// };
 export const getUserDetails = async () => {
-    const id = localStorage.getItem("userId");
-    const res = await axios.get(`/user/${id}`).catch((err) => console.log(err));
-    if (res.status !== 200) {
-        return console.log("Unexpected Error");
+  const userId = localStorage.getItem("userId"); // Fetch userId from localStorage
+
+  if (!userId) {
+    console.error("User ID not found in localStorage.");
+    return null;
+  }
+
+  try {
+    const res = await axios.get(`/user/${userId}`);
+
+    if (res.status === 200) {
+      return res.data; // Return user details
+    } else {
+      console.error("Unexpected error fetching user details.");
+      return null;
     }
-    const resData = await res.data;
-    return resData;
+  } catch (err) {
+    console.error("Error fetching user details:", err.message);
+    return null;
+  }
 };
+
 export const deleteBooking = async (id) => {
     const res = await axios
         .delete(`/bookings/${id}`)

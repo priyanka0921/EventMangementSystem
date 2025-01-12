@@ -2,13 +2,14 @@ import { Box, Button } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { useDispatch } from "react-redux";
+import { userActions } from '../store';
 const PasswordField = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
-
+    const dispatch = useDispatch(); 
     // Retrieve the user's email from localStorage
     const userEmail = localStorage.getItem("userEmail");
 
@@ -29,6 +30,7 @@ const PasswordField = () => {
         }
 
         try {
+            const userId = localStorage.getItem("userId");
             // Send the email and password to the backend
             const response = await axios.post("http://localhost:5000/users/set-password", {
                 email: userEmail,
@@ -36,7 +38,10 @@ const PasswordField = () => {
             });
 
             if (response.status === 200) {
+                
                 console.log("Password updated successfully");
+                localStorage.setItem("userId", userId); 
+                dispatch(userActions.login({ email: userEmail, isLoggedIn: true }));
 
                 // After successful password update, navigate to the home page
                 navigate("/"); // Assuming you use react-router-dom for navigation
